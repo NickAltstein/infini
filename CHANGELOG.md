@@ -6,6 +6,11 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/) 
 
 ---
 
+## [Unreleased]
+
+### Added
+- **Observatory blast-radius sandbox:** `/sandbox` signs simulated MCP calls in the browser with WebCrypto Ed25519 (HMAC-SHA256 when Ed25519 is unavailable), lexicographic JSON, and a Merkle checkpoint. A one-byte parameter flip fails closed. The standalone page is [birkin-sandbox](https://github.com/NickAltstein/birkin-sandbox).
+
 ## [0.2.0] — 2026-11-04
 
 ### Added

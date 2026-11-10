@@ -408,6 +408,9 @@ export default function ObservatoryPage() {
               onChange={handleFileUpload}
               className="hidden"
             />
+            <a href="/sandbox" className="btn-ghost flex items-center justify-center gap-2 text-xs">
+              Blast Radius
+            </a>
             <button
               onClick={() => fileInputRef.current?.click()}
               className="btn-ghost flex items-center justify-center gap-2 text-xs"

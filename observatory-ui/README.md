@@ -1,6 +1,6 @@
 # INFINI Observatory UI
 
-The local Next.js 15 dashboard for visualizing Loopfile execution traces.
+The local Next.js dashboard for visualizing Loopfile execution traces.
 The signature feature — the DevTools for autonomous systems.
 
 > **Status: Preview.** The UI renders traces produced by `infini run --mock`.
@@ -44,6 +44,26 @@ Deep charcoal background with atmospheric cyan haze. Soft glowing outlines
 around every panel. Clean techno-sans-serif typography. Framer Motion
 transitions between states. The goal: look like a premium AI product,
 not a cluttered terminal.
+
+---
+
+## Blast-radius sandbox
+
+`/sandbox` is a static page that signs simulated tool calls in the browser.
+
+- Canonical JSON uses lexicographic key order before SHA-256.
+- The header badge shows `Ed25519` or `HMAC-SHA256`, whichever WebCrypto could initialize.
+- `?scenario=<id>&step=<index>&tamper=<0|1>&disabledPolicies=<csv>` is written with `history.replaceState`.
+- **Inject 1-Byte Tamper** changes the current step's parameters and does not re-sign. Verification then reports a Merkle root and signature mismatch.
+- **Copy Exploit Deep-Link** copies that frame's URL.
+
+```bash
+npm run test:sandbox
+npm run dev
+# http://localhost:3000/sandbox
+```
+
+The standalone export lives at [birkin-sandbox](https://github.com/NickAltstein/birkin-sandbox).
 
 ---
 

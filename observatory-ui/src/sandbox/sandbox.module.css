@@ -1,0 +1,282 @@
+.page {
+  --canvas: #0b0d11;
+  --surface: #11141c;
+  --line: #222733;
+  --cyan: #38bdf8;
+  --ok: #10b981;
+  --bad: #f43f5e;
+  --text: #e6e8ee;
+  --muted: #8b93a7;
+  min-height: 100vh;
+  color: var(--text);
+  background-color: var(--canvas);
+  background-image:
+    linear-gradient(to right, var(--line) 1px, transparent 1px),
+    linear-gradient(to bottom, var(--line) 1px, transparent 1px);
+  background-size: 32px 32px;
+  font-family: "Segoe UI", Helvetica, Arial, sans-serif;
+}
+
+.shell {
+  width: min(1180px, calc(100% - 32px));
+  margin: 0 auto;
+  padding: 20px 0 40px;
+}
+
+.header,
+.panel,
+.banner,
+.stepButton,
+.chip,
+.action,
+.link {
+  background: var(--surface);
+  border: 1px solid var(--line);
+}
+
+.header {
+  display: flex;
+  justify-content: space-between;
+  gap: 16px;
+  padding: 16px;
+}
+
+.kicker,
+.label,
+.badge,
+.action,
+.chip,
+.stepButton,
+.link,
+.hash,
+.banner {
+  font-family: ui-monospace, "SFMono-Regular", Menlo, Consolas, monospace;
+}
+
+.kicker {
+  margin: 0 0 6px;
+  color: var(--cyan);
+  font-size: 11px;
+  letter-spacing: 0.14em;
+}
+
+.title {
+  margin: 0;
+  font-size: 22px;
+  font-weight: 560;
+  letter-spacing: 0.01em;
+}
+
+.lede {
+  margin: 6px 0 0;
+  max-width: 62ch;
+  color: var(--muted);
+  font-size: 13px;
+  line-height: 1.45;
+}
+
+.headerMeta {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
+  gap: 8px;
+}
+
+.badgeRow,
+.actions,
+.chips,
+.stepRail {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+
+.badge {
+  padding: 4px 8px;
+  border: 1px solid var(--line);
+  color: var(--cyan);
+  font-size: 11px;
+  letter-spacing: 0.08em;
+}
+
+.ok {
+  color: var(--ok);
+  border-color: var(--ok);
+}
+
+.bad {
+  color: var(--bad);
+  border-color: var(--bad);
+}
+
+.actions {
+  margin-top: 12px;
+}
+
+.action,
+.chip,
+.stepButton,
+.link {
+  color: var(--text);
+  cursor: pointer;
+  font-size: 12px;
+  letter-spacing: 0.04em;
+}
+
+.action,
+.link {
+  padding: 8px 10px;
+  text-decoration: none;
+}
+
+.action {
+  color: var(--cyan);
+}
+
+.action[aria-pressed="true"],
+.chip[aria-pressed="true"],
+.stepButton[aria-pressed="true"] {
+  border-color: var(--cyan);
+  color: var(--cyan);
+}
+
+.action:disabled {
+  cursor: wait;
+  opacity: 0.6;
+}
+
+.banner {
+  margin-top: 12px;
+  padding: 10px 12px;
+  color: var(--bad);
+  font-size: 13px;
+  letter-spacing: 0.04em;
+}
+
+.layout {
+  display: grid;
+  grid-template-columns: 280px 1fr;
+  gap: 12px;
+  margin-top: 12px;
+}
+
+.panel {
+  padding: 12px;
+}
+
+.panel h2,
+.block h3 {
+  margin: 0 0 8px;
+  font-size: 12px;
+  font-weight: 600;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+}
+
+.scenario {
+  display: block;
+  width: 100%;
+  margin-bottom: 8px;
+  padding: 8px;
+  text-align: left;
+  color: var(--text);
+  background: transparent;
+  border: 1px solid transparent;
+  cursor: pointer;
+}
+
+.scenario[aria-pressed="true"] {
+  border-color: var(--line);
+}
+
+.scenario strong,
+.block p,
+.effect {
+  display: block;
+  font-size: 13px;
+  line-height: 1.45;
+}
+
+.scenario span,
+.note,
+.effect {
+  color: var(--muted);
+}
+
+.label {
+  margin: 14px 0 8px;
+  color: var(--muted);
+  font-size: 11px;
+  letter-spacing: 0.12em;
+}
+
+.chip,
+.stepButton {
+  padding: 6px 8px;
+  background: var(--canvas);
+}
+
+.grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 12px;
+}
+
+.block {
+  min-width: 0;
+}
+
+.hash,
+.canonical {
+  margin: 0;
+  overflow-x: auto;
+  color: var(--text);
+  font-size: 12px;
+  line-height: 1.5;
+  white-space: pre-wrap;
+}
+
+.canonicalLine {
+  white-space: pre;
+  word-break: normal;
+}
+
+.canonical {
+  padding: 8px;
+  background: var(--canvas);
+  border: 1px solid var(--line);
+}
+
+.mismatch {
+  color: var(--bad);
+}
+
+.note {
+  margin: 12px 0 0;
+  overflow-x: auto;
+  font-size: 12px;
+  line-height: 1.45;
+  white-space: nowrap;
+}
+
+.share {
+  width: 100%;
+  margin-top: 8px;
+  padding: 8px;
+  color: var(--text);
+  background: var(--canvas);
+  border: 1px solid var(--line);
+}
+
+@media (max-width: 860px) {
+  .header,
+  .headerMeta {
+    align-items: stretch;
+    flex-direction: column;
+  }
+
+  .layout,
+  .grid {
+    grid-template-columns: 1fr;
+  }
+}

@@ -215,6 +215,16 @@ infini verify-trace runs/latest/run.json
 
 If any step, outcome, or token cost is tampered with, verification fails immediately. See [`docs/signing.md`](docs/signing.md) for the specification and external verifier interface.
 
+The observatory also serves a browser interceptor at [`/sandbox`](observatory-ui/src/app/sandbox/page.tsx). It signs each simulated MCP call with WebCrypto (Ed25519, or HMAC-SHA256 when Ed25519 is missing), canonicalizes the payload with lexicographic JSON, and checks a Merkle root. A one-byte parameter flip fails closed. The same page is published on its own as [birkin-sandbox](https://github.com/NickAltstein/birkin-sandbox).
+
+```bash
+cd observatory-ui
+npm install
+npm run test:sandbox
+npm run dev
+# http://localhost:3000/sandbox
+```
+
 ---
 
 ## Project Readiness Audit
@@ -236,7 +246,7 @@ Consolidated from historical status documents.
 - **Reference Engine:** Working. Deterministic mock engine, budget enforcement, syntactic file checks, semantic judge checks, and time-travel replay.
 - **Adapters:** 1 reference engine working (`infini`), 5 mock-only adapters (`langgraph`, `hermes`, `openclaw`, `codemap`, `local`), 5 not built (`crewai`, `autogen`, `mastra`, `goose`, `openai-agents`).
 - **Observability:** OpenTelemetry GenAI semantic conventions exporter + step-level divergence diffing.
-- **Integrity:** Local Ed25519 trace signing and offline verification.
+- **Integrity:** Local Ed25519 trace signing and offline verification. Browser blast-radius sandbox at `observatory-ui` `/sandbox`.
 - **Memory & Storage:** Embedded SQLite with FTS5 for local run memory and state persistence.
 - **Conformance Suite:** 8/8 tests passing (`tests/conformance/`).
 
