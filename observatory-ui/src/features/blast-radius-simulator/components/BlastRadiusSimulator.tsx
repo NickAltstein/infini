@@ -482,12 +482,12 @@ export function BlastRadiusSimulator() {
           </div>
         </section>
 
-        {/* PANE 2: BIRKIN INTERCEPTOR & CRYPTOGRAPHIC RECEIPT (5 Cols) */}
+        {/* PANE 2: RECEIPTD INTERCEPTOR & CRYPTOGRAPHIC RECEIPT (5 Cols) */}
         <section className="col-span-12 lg:col-span-5 p-5 sm:p-6 space-y-6 bg-[#0B0D11]">
           <div className="flex items-center justify-between border-b border-[#222733] pb-4">
             <div>
               <div className="text-[10px] font-mono uppercase tracking-wider text-slate-400">
-                03 / Birkin AST &amp; JSON-RPC Interceptor
+                03 / Receiptd AST &amp; JSON-RPC Interceptor
               </div>
               <h2 className="font-serif text-2xl text-white mt-0.5 tracking-tight">
                 Step T+{activeStepIdx}: {activeReceipt?.mcpRequest.params.name ?? "..."}

@@ -2,7 +2,7 @@ import type { Metadata } from "next";
 import { BlastRadiusSimulator } from "@/features/blast-radius-simulator";
 
 export const metadata: Metadata = {
-  title: "Birkin Blast-Radius Simulator & Deterministic Interceptor",
+  title: "AuditGPT — Cryptographic Proof for Every Autonomous Tool Call",
   description:
     "Interactive adversarial MCP attack vector simulator, RFC-8785 deterministic canonicalization, WebCrypto Ed25519 execution receipts, and SHA-256 Merkle audit ledgers.",
 };
