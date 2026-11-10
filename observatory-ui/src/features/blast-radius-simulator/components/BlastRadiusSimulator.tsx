@@ -389,7 +389,7 @@ export function BlastRadiusSimulator() {
           </h1>
 
           <p className="text-sm sm:text-base text-slate-400 max-w-2xl font-sans leading-relaxed">
-            Probabilistic LLM guardrails fail under prompt injection. <strong className="text-white font-normal">Receiptd</strong> enforces sub-2ms fail-closed <code className="text-sky-300 font-mono text-xs px-1.5 py-0.5 bg-[#11141C] border border-[#222733]">PreToolUse</code> hooks outside the model runtime, signing tamper-evident <code className="text-sky-300 font-mono text-xs px-1.5 py-0.5 bg-[#11141C] border border-[#222733]">Ed25519</code> receipts you can verify offline.
+            Probabilistic LLM guardrails fail under prompt injection. <strong className="text-white font-normal">Receiptd</strong> enforces 0.02ms in-process policy checks (~67ms cold CLI hook) outside the model runtime, signing tamper-evident <code className="text-sky-300 font-mono text-xs px-1.5 py-0.5 bg-[#11141C] border border-[#222733]">Ed25519</code> receipts you can verify offline.
           </p>
 
           <div className="flex flex-wrap items-center gap-3 sm:gap-4 pt-2">
@@ -761,7 +761,7 @@ export function BlastRadiusSimulator() {
               $ pip install git+https://github.com/NickAltstein/receiptd &amp;&amp; receiptd init --claude-code
             </div>
             <div className="text-[10px] text-emerald-400 font-mono flex items-center gap-1 pt-0.5">
-              <span>✓ 100% Local Execution • Zero Data Egress • Apache 2.0 / MIT Open Source</span>
+              <span>✓ 100% Local Execution • Zero Data Egress • Open Source (MIT)</span>
             </div>
           </div>
         </section>
@@ -836,7 +836,7 @@ export function BlastRadiusSimulator() {
                   </span>
                 </div>
                 <p className="text-xs text-slate-300 leading-relaxed">
-                  Deterministic, un-bypassable execution boundary for MCP and Claude Code. Evaluates proposed tool invocations in &lt;1.5ms, halts violations fail-closed with exit code 2, and signs offline-verifiable receipts.
+                  Deterministic, un-bypassable execution boundary for MCP and Claude Code. Evaluates proposed tool invocations in 0.02ms in-process (~67ms cold hook process), halts violations fail-closed with exit code 2, and signs offline-verifiable receipts.
                 </p>
                 <div className="bg-[#0B0D11] p-3 border border-[#222733] font-mono text-[11px] text-slate-300 leading-relaxed overflow-x-auto">
                   <div className="text-slate-500 mb-1"># .claude/settings.json — PreToolUse Hard Hook</div>

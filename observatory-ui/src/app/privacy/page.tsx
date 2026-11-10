@@ -36,28 +36,28 @@ export default function PrivacyPage() {
 
           <section className="space-y-2">
             <h2 className="text-base font-semibold text-emerald-400 font-mono uppercase tracking-wide">
-              1. Our Core Commitment: Zero Data Egress
+              1. Local-First Architecture: CLI &amp; GitHub Actions
             </h2>
             <p className="text-white font-medium">
-              AuditGPT and the Receiptd runtime engine operate on a local-first, zero-data-egress architecture.
+              The CLI tools, GitHub Actions, and Receiptd runtime hooks execute 100% locally and send zero data off your machine.
             </p>
             <ul className="list-disc list-inside space-y-1.5 text-slate-400">
-              <li>When you execute <code className="text-sky-300 font-mono text-xs">npx auditgpt test</code> or wire <code className="text-emerald-400 font-mono text-xs">Receiptd</code> runtime hooks (<code className="text-sky-300 font-mono text-xs">PreToolUse</code>), your agent prompts, tool arguments, environment variables (<code className="text-sky-300 font-mono text-xs">.env</code>), API keys, and execution traces <strong>never leave your local machine or your private GitHub Actions runner</strong>.</li>
-              <li>We do not collect, ingest, store, or transmit your proprietary agent payloads or codebase contents to our servers.</li>
+              <li>When you run the CLI tools or wire <code className="text-emerald-400 font-mono text-xs">Receiptd</code> runtime hooks (<code className="text-sky-300 font-mono text-xs">PreToolUse</code>), your agent prompts, tool arguments, environment variables (<code className="text-sky-300 font-mono text-xs">.env</code>), API keys, and execution traces <strong>never leave your local runner or private GitHub Actions runner</strong>.</li>
+              <li>The CLI tools and GitHub Actions send no telemetry, prompts, codebase contents, or credentials to any remote server.</li>
             </ul>
           </section>
 
           <section className="space-y-2">
             <h2 className="text-base font-semibold text-white font-mono uppercase tracking-wide">
-              2. Information We Collect
+              2. Website Operations &amp; Logging (auditgpt.ai)
             </h2>
             <p>
-              We collect minimal telemetry strictly required to operate the web platform and authenticate enterprise accounts:
+              When you visit the <code className="text-sky-300 font-mono text-xs">auditgpt.ai</code> website:
             </p>
             <ul className="list-disc list-inside space-y-1.5 text-slate-400">
-              <li><strong>Account &amp; Billing Data:</strong> If you register for an enterprise tier, we collect your email address and billing details via our secure payment processor (Stripe). We never store raw credit card numbers.</li>
-              <li><strong>Basic Website Analytics:</strong> Standard server access logs (IP addresses, browser user-agent, timestamps) collected when visiting <code className="text-sky-300 font-mono text-xs">auditgpt.ai</code>.</li>
-              <li><strong>Public GitHub Metadata:</strong> If you install our GitHub Action, we interact solely with public repository metadata and check run statuses as permitted by standard GitHub OAuth scopes.</li>
+              <li><strong>Interactive Simulator State:</strong> The Blast-Radius Simulator executes entirely in your browser via client-side WebCrypto. Execution state, simulated vectors, and hashes remain in your browser memory and URL parameters; they are not sent to or stored on our servers.</li>
+              <li><strong>Standard Server Request Logs:</strong> Like virtually all web hosts, our hosting provider (Vercel) automatically records standard HTTP request metadata (IP addresses, browser user-agent, referrers, and request timestamps) strictly for routing, CDN caching, performance monitoring, and security defense.</li>
+              <li><strong>Account &amp; Commercial Billing:</strong> If you register for commercial support tiers, payment processing and billing records are handled directly by our payment processor (Stripe). We never store raw payment card credentials.</li>
             </ul>
           </section>
 

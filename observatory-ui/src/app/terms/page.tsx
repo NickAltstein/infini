@@ -39,7 +39,7 @@ export default function TermsPage() {
               1. Scope of Service &amp; Open-Core Licensing
             </h2>
             <p>
-              AuditGPT provides pre-merge adversarial testing batteries, CI/CD security gates, and runtime authorization engines (including the open-source Receiptd protocol) designed to evaluate and govern autonomous AI agents. Certain components are distributed under open-source licenses (e.g., Apache 2.0 / MIT); your use of those components is governed by their respective licenses.
+              AuditGPT provides pre-merge adversarial testing batteries, CI/CD security gates, and runtime authorization engines (including the open-source Receiptd protocol) designed to evaluate and govern autonomous AI agents. Certain components are distributed under open-source licenses (e.g., MIT for code, CC-BY-4.0 for specifications); your use of those components is governed by their respective licenses.
             </p>
           </section>
 
