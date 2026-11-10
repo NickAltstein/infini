@@ -304,26 +304,33 @@ export function BlastRadiusSimulator() {
         <div className="flex items-center gap-4">
           <div className="flex items-baseline gap-2">
             <span className="font-serif text-2xl tracking-tight text-white font-semibold">
-              BIRKIN
+              AUDITGPT.AI
             </span>
             <span className="font-mono text-xs text-[#38BDF8]">
-              / INFINI SIMULATOR
+              / DETERMINISTIC AGENT FIREWALL
             </span>
           </div>
-          <span className="hidden sm:inline-block font-mono text-[10px] uppercase tracking-widest px-2 py-0.5 border border-[#222733] text-slate-400">
-            Deterministic MCP Firewall &amp; Time-Travel Debugger
+          <span className="hidden xl:inline-block font-mono text-[10px] uppercase tracking-wider px-2 py-0.5 border border-[#222733] text-slate-400">
+            CI Gate &amp; Cryptographic Evidence Layer (Zero LLM Tokens)
           </span>
         </div>
 
-        <div className="flex items-center gap-4 sm:gap-6 font-mono text-xs text-slate-400">
-          <div className="flex items-center gap-1.5">
-            <span className="text-[10px] text-slate-500 uppercase">Engine:</span>
-            <span className="text-[#10B981] font-semibold">FAIL-CLOSED</span>
-          </div>
+        {/* Center Badges */}
+        <div className="hidden lg:flex items-center gap-2 font-mono text-[11px]">
+          <span className="px-2.5 py-1 bg-[#11141C] border border-[#222733] text-slate-300">
+            RUNTIME: <span className="text-emerald-400 font-semibold">Birkin (Ed25519 + Merkle)</span>
+          </span>
+          <span className="px-2.5 py-1 bg-[#11141C] border border-[#222733] text-slate-300">
+            TRACE: <span className="text-[#38BDF8] font-semibold">INFINI (SQLite + FTS5)</span>
+          </span>
+        </div>
+
+        {/* Right Links & Exploit Deep-Link */}
+        <div className="flex items-center gap-3 sm:gap-4 font-mono text-xs text-slate-400">
           <div className="hidden md:flex items-center gap-1.5">
             <span className="text-[10px] text-slate-500 uppercase">Signing:</span>
             <span className="text-[#38BDF8] font-semibold">
-              {signerCtx ? signerCtx.scheme : "WebCrypto Initializing..."}
+              {signerCtx ? signerCtx.scheme : "WebCrypto..."}
             </span>
           </div>
           <div className="flex items-center gap-1.5">
@@ -332,20 +339,36 @@ export function BlastRadiusSimulator() {
               {activeReceipt ? `${activeReceipt.latencyMs}ms` : "0.00ms"}
             </span>
           </div>
+          <a
+            href="https://github.com/NickAiNYC/Birkin"
+            target="_blank"
+            rel="noopener noreferrer"
+            className="hidden sm:inline-block px-2 py-1 text-slate-300 hover:text-white hover:border-[#38BDF8] border border-[#222733] transition-colors"
+          >
+            GitHub: Birkin
+          </a>
+          <a
+            href="https://github.com/NickAiNYC/infini"
+            target="_blank"
+            rel="noopener noreferrer"
+            className="hidden sm:inline-block px-2 py-1 text-slate-300 hover:text-white hover:border-[#38BDF8] border border-[#222733] transition-colors"
+          >
+            GitHub: INFINI
+          </a>
           <button
             onClick={handleCopyLink}
-            className="flex items-center gap-1 px-2.5 py-1 border border-[#222733] text-xs font-mono text-slate-300 hover:text-white hover:border-[#38BDF8] transition-colors"
+            className="flex items-center gap-1 px-2.5 py-1 border border-[#38BDF8]/40 bg-[#38BDF8]/10 text-xs font-mono text-[#38BDF8] hover:bg-[#38BDF8]/20 transition-colors cursor-pointer"
             title="Copy shareable exploit deep-link"
           >
             {copiedLink ? (
               <>
-                <Check className="w-3.5 h-3.5 text-[#10B981]" />
-                <span className="text-[#10B981]">LINK COPIED</span>
+                <Check className="w-3.5 h-3.5 text-emerald-400" />
+                <span className="text-emerald-400">Copied!</span>
               </>
             ) : (
               <>
-                <Copy className="w-3.5 h-3.5" />
-                <span>SHARE DEEP-LINK</span>
+                <Copy className="w-3.5 h-3.5 text-[#38BDF8]" />
+                <span>Copy Exploit Deep-Link</span>
               </>
             )}
           </button>
@@ -697,11 +720,103 @@ export function BlastRadiusSimulator() {
               Wrap Any Agent In 1 Command
             </div>
             <div className="text-slate-300 text-[11px] select-all bg-[#0B0D11] p-2 border border-[#222733]">
-              $ npx birkin-proxy --wrap &quot;claude&quot; --policy strict
+              $ pip install birkin &amp;&amp; birkin init --claude-code
             </div>
           </div>
         </section>
       </main>
+
+      {/* Below-the-Fold Strip (2 Columns — Pre-Deployment CI Gate vs. Runtime Enforcement) */}
+      <footer className="border-t border-[#222733] bg-[#0B0D11] px-6 py-10">
+        <div className="max-w-[1720px] mx-auto">
+          <div className="mb-6 flex flex-col md:flex-row md:items-end justify-between gap-4">
+            <div>
+              <div className="font-mono text-xs text-[#38BDF8] uppercase tracking-wider mb-1">
+                THE OPEN-CORE TRIAD // ZERO-TRUST AGENT ARCHITECTURE
+              </div>
+              <h2 className="font-serif text-2xl text-white font-normal">
+                Pre-Deployment CI Replay &times; Runtime Deterministic Firewall
+              </h2>
+            </div>
+            <div className="font-mono text-xs text-slate-400">
+              Zero Marketing Tiers · 100% Open Source Engineering
+            </div>
+          </div>
+
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+            {/* Column 1 — Pre-Merge CI Gate (INFINI) */}
+            <div className="p-5 border border-[#222733] bg-[#11141C] flex flex-col justify-between">
+              <div className="space-y-3">
+                <div className="flex items-center justify-between">
+                  <span className="font-mono text-xs font-semibold text-[#38BDF8] uppercase tracking-wider">
+                    1. Pre-Merge CI Gate — INFINI
+                  </span>
+                  <span className="font-mono text-[10px] text-slate-400 bg-[#0B0D11] px-2 py-0.5 border border-[#222733]">
+                    SQLite + FTS5
+                  </span>
+                </div>
+                <p className="text-xs text-slate-300 leading-relaxed">
+                  Eliminates Denial-of-Wallet loops and prompt-injection regressions in GitHub Actions before code merge. Evaluates pre-execution budget invariants and replay assertions without external dependencies.
+                </p>
+                <div className="bg-[#0B0D11] p-3 border border-[#222733] font-mono text-[11px] text-slate-300 leading-relaxed overflow-x-auto">
+                  <div className="text-slate-500 mb-1"># Loopfile.yaml — Denial-of-Wallet Circuit Breaker</div>
+                  <div><span className="text-[#38BDF8]">cycle_detection</span>:</div>
+                  <div>&nbsp;&nbsp;<span className="text-emerald-400">max_identical_tool_calls</span>: 2</div>
+                  <div>&nbsp;&nbsp;<span className="text-emerald-400">max_consecutive_tool_errors</span>: 3</div>
+                  <div><span className="text-[#38BDF8]">limits</span>:</div>
+                  <div>&nbsp;&nbsp;<span className="text-emerald-400">max_cost_usd</span>: 1.25</div>
+                </div>
+              </div>
+              <div className="mt-4 pt-4 border-t border-[#222733] flex items-center justify-between">
+                <span className="font-mono text-[11px] text-slate-400">pip install infini-cli</span>
+                <a
+                  href="https://github.com/NickAiNYC/infini"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="font-mono text-xs text-[#38BDF8] hover:underline flex items-center gap-1 font-semibold"
+                >
+                  GitHub: NickAiNYC/infini &rarr;
+                </a>
+              </div>
+            </div>
+
+            {/* Column 2 — Runtime Enforcement (Birkin) */}
+            <div className="p-5 border border-[#222733] bg-[#11141C] flex flex-col justify-between">
+              <div className="space-y-3">
+                <div className="flex items-center justify-between">
+                  <span className="font-mono text-xs font-semibold text-emerald-400 uppercase tracking-wider">
+                    2. Runtime Enforcement — Birkin
+                  </span>
+                  <span className="font-mono text-[10px] text-slate-400 bg-[#0B0D11] px-2 py-0.5 border border-[#222733]">
+                    Ed25519 + Merkle
+                  </span>
+                </div>
+                <p className="text-xs text-slate-300 leading-relaxed">
+                  Deterministic, un-bypassable execution boundary for MCP and Claude Code. Evaluates proposed tool invocations in &lt;1.5ms, halts violations fail-closed with exit code 2, and signs offline-verifiable receipts.
+                </p>
+                <div className="bg-[#0B0D11] p-3 border border-[#222733] font-mono text-[11px] text-slate-300 leading-relaxed overflow-x-auto">
+                  <div className="text-slate-500 mb-1"># .claude/settings.json — PreToolUse Hard Hook</div>
+                  <div>&#123;</div>
+                  <div>&nbsp;&nbsp;<span className="text-[#38BDF8]">&quot;matcher&quot;</span>: <span className="text-emerald-400">&quot;Bash|Write|Edit|mcp__.*&quot;</span>,</div>
+                  <div>&nbsp;&nbsp;<span className="text-[#38BDF8]">&quot;hooks&quot;</span>: [&#123; <span className="text-slate-400">&quot;type&quot;</span>: <span className="text-emerald-400">&quot;command&quot;</span>, <span className="text-slate-400">&quot;command&quot;</span>: <span className="text-amber-300">&quot;python3 -m birkin.hooks.claude_code_gate&quot;</span> &#125;]</div>
+                  <div>&#125;</div>
+                </div>
+              </div>
+              <div className="mt-4 pt-4 border-t border-[#222733] flex items-center justify-between">
+                <span className="font-mono text-[11px] text-slate-400">pip install birkin &amp;&amp; birkin init</span>
+                <a
+                  href="https://github.com/NickAiNYC/Birkin"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="font-mono text-xs text-emerald-400 hover:underline flex items-center gap-1 font-semibold"
+                >
+                  GitHub: NickAiNYC/Birkin &rarr;
+                </a>
+              </div>
+            </div>
+          </div>
+        </div>
+      </footer>
     </div>
   );
 }

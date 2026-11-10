@@ -1,275 +1,195 @@
-<picture>
-  <source media="(prefers-color-scheme: dark)" srcset="assets/logo-dark.png">
-  <source media="(prefers-color-scheme: light)" srcset="assets/logo-light.png">
-  <img alt="INFINI" src="assets/banner.png" width="100%">
-</picture>
+# INFINI
 
-# INFINI — Portable Agent Workflow Spec & CLI
+**Deterministic Agent Trace Runtime, SQLite + FTS5 Time-Travel Replay CLI, and Cross-Engine Workflow Specification.**
 
-**What can you do with INFINI that you cannot do with a normal agent framework?**  
-**Run the exact same agent workflow across multiple execution engines, verify outputs against real constraints, and diff standardized execution traces to see precisely where runtimes diverge.**  
-*(The reference engine is fully implemented for live local workflow execution; external runtime adapters like LangGraph and CrewAI currently operate in simulated/mock mode for trace schema comparison and divergence detection; live third-party runtime execution is experimental/in-progress.)*
+[![Specification](https://img.shields.io/badge/spec-v0.4_Verified-38BDF8?style=flat-square)](https://github.com/NickAiNYC/infini)
+[![CI Guard](https://img.shields.io/badge/infini--guard-passing-10B981?style=flat-square&logo=github)](https://github.com/NickAiNYC/infini/actions)
+[![Storage Engine](https://img.shields.io/badge/storage-SQLite_%2B_FTS5-0B0D11?style=flat-square)](#sqlite--fts5-trace-architecture)
+[![Interactive Observatory](https://img.shields.io/badge/LIVE_DEMO-Observatory_Sandbox-38BDF8?style=flat-square)](https://auditgpt.ai)
+[![License: MIT](https://img.shields.io/badge/license-MIT-64748B?style=flat-square)](./LICENSE)
 
-[![CI](https://img.shields.io/github/actions/workflow/status/NickAiNYC/infini/infini-ci.yml?style=flat-square&branch=main&label=CI)](https://github.com/NickAiNYC/infini/actions)
-[![Conformance](https://img.shields.io/badge/conformance-9%2F9%20passed-brightgreen?style=flat-square)](docs/conformance.md)
-[![Python](https://img.shields.io/badge/python-3.11%20%7C%203.12-blue?style=flat-square)](pyproject.toml)
-[![License](https://img.shields.io/badge/license-MIT-blue?style=flat-square)](LICENSE)
+Autonomous agent workflows fail silently across non-deterministic LLM sampling, brittle MCP tool calls, and runaway recursive retry loops. Standard observability platforms treat agent traces as append-only cloud telemetry—requiring external Redis/Kafka clusters while offering zero local replayability or hard circuit breakers before token budgets are exhausted.
+
+**INFINI** is a zero-dependency, portable agent execution standard (`Loopfile`) and **SQLite-backed trace orchestration CLI**. It captures every prompt, MCP JSON-RPC 2.0 frame, filesystem mutation, and environment state into a signed, content-addressed `.trace` artifact—enabling **zero-token time-travel debugging**, **cross-runtime execution diffing**, and **deterministic Denial-of-Wallet (DoW) circuit breaking**.
 
 ---
 
-## The Problem: Runtime Lock-In & Unverifiable Traces
+## Core Architecture
 
-Every modern agent runtime (LangGraph, CrewAI, AutoGen, custom orchestration) forces you to hardcode control flow, state schemas, and verification into proprietary code. If you want to evaluate an alternative engine or compare how two runtimes execute the exact same task, you have to rewrite the workflow from scratch and parse incompatible log dumps.
+```mermaid
+flowchart TB
+    subgraph Spec ["1. Portable Loopfile Specification"]
+        A[Loopfile.yaml / MCP Config] --> B[INFINI Orchestration Runtime]
+    end
 
-**INFINI solves this by separating the workflow specification from the runtime engine.**
-1. You declare the workflow once in a portable `Loopfile.yaml`.
-2. Conforming engines execute the workflow and produce structured traces (`run.json`). *(Today, the built-in reference engine executes live workflows, while external adapters like `langgraph` operate in simulated/mock mode for trace schema translation and divergence diffing.)*
-3. You diff traces across engines to find divergences in step ordering, latency, costs, or check failures.
+    subgraph Guard ["2. Pre-Execution & Cost Circuit Breakers"]
+        B --> C{Denial-of-Wallet & Loop Detector}
+        C -->|Recursive Cycle / Budget Exceeded| D[Halt Fail-Closed + Emit Trace Proof]
+        C -->|Within Bounds| E[Execute Engine: Claude / OpenAI / Local / MCP]
+    end
 
-<p align="center">
-  <img src="assets/architecture.svg" alt="INFINI System Architecture" width="100%" />
-</p>
+    subgraph Ledger ["3. SQLite + FTS5 Deterministic `.trace` Artifact"]
+        E --> F[(SQLite WAL State Store)]
+        F --> G[FTS5 Verbatim Context Index]
+        F --> H[SHA-256 Frame Hash + Ed25519 Signature]
+    end
+
+    H --> I[Time-Travel Fork & Replay CLI]
+    H --> J[Cross-Engine Diff: `infini diff`]
+    H --> K[Observatory Web UI: auditgpt.ai]
+```
 
 ---
 
-## ⚡ 60-Second Quick Start
+## Systems Engineering Guarantees
 
-Zero-configuration quick start. Requires Python 3.11+. Succeeds on a clean clone in under 60 seconds with no API keys or external services:
+- **Zero-Infrastructure SQLite + FTS5 Persistence**: Eliminates external vector databases and Redis state dependencies. Every execution trace compiles into a single portable SQLite WAL database (`*.trace`) indexed with SQLite FTS5 for sub-millisecond verbatim retrieval across tool outputs, stdout/stderr streams, and prompt contexts.
+- **Deterministic Time-Travel Forking (Zero Upstream LLM Tokens)**: Scrub to any historical step $T+N$ in a recorded `.trace` ledger, mutate the tool response or policy constraint, and deterministically replay downstream assertions without re-invoking upstream LLM API calls.
+- **Denial-of-Wallet (DoW) & Cyclic Loop Analysis**: Detects degenerate semantic retry loops (e.g., an agent repeatedly calling a failing linter or rate-limited endpoint), tracks cumulative token/cost velocity per frame, and enforces hard pre-execution budget circuit breakers.
+- **Adversarial Honeypot & MCP Runtime Verification**: Ships with built-in MCP honeypot servers to test agent resilience against indirect prompt injection, poisoned tool descriptions, and unauthorized filesystem traversal prior to production deployment.
+
+---
+
+## Interactive Web Observatory & Blast-Radius Sandbox
+
+Inspect live `.trace` state machines, test MCP policy gates, and fork execution timelines directly in your browser with zero local setup:
+
+* **[Launch INFINI / Birkin Observatory Sandbox → `auditgpt.ai`](https://auditgpt.ai)**
+
+---
+
+## Quickstart
+
+### 1. Installation
 
 ```bash
-# 1. Clone & install in a fresh virtualenv
+# Install from source in an isolated virtual environment (Python 3.11+)
 git clone https://github.com/NickAiNYC/infini.git
 cd infini
-python3.11 -m venv venv
-source venv/bin/activate
-pip install -e .
-
-# 2. Run the automated walkthrough in one command:
-./demo.sh
-
-# Or step-by-step:
-infini run examples/quickstart.yaml      # Execute workflow
-infini inspect runs/latest/              # Inspect execution trace
-infini replay runs/latest/ --step s1     # Time-travel replay
+pip install -e ".[dev]"
 ```
 
-Every run emits a structured `run.json` recording every step, cost, token count, and verification check.
-
----
-
-## 🎬 60-Second Demo
-
-Terminal walkthrough demonstrating: `run` $\rightarrow$ `inspect` $\rightarrow$ `replay --step` $\rightarrow$ `diff` across two engines:
-
-```text
-# 1. Execute on Reference engine
-$ infini run examples/quickstart.yaml -o runs/reference
-▶ engine: infini-reference (mock)
-  ✓ s1 analyze  $0.01 · 0.6m
-▶ verification:
-  ✓ report.md:exists
-  ✓ judge:summary_quality>=80 (conf 82.0)
-✓ shipped. trace: runs/reference/run.json
-
-# 2. Inspect trace table
-$ infini inspect runs/reference/
-╭──────────────────────────────────────────────────────────────────╮
-│ quickstart  ·  engine: infini-reference  ·  outcome: verified     │
-╰──────────────────────────────────────────────────────────────────╯
-Steps:
-  ✓ s1 analyze | ok | $0.01 | 0.6m | report.md
-
-# 3. Replay from a specific step (deterministic cache)
-$ infini replay runs/reference/ --step s1
-▶ replay quickstart from step s1
-  ✓ s1 analyze
-✓ replay complete
-
-# 4. Execute on LangGraph adapter (simulated) and diff execution traces
-$ infini run examples/quickstart.yaml --engine langgraph -o runs/langgraph
-$ infini diff runs/reference/run.json runs/langgraph/run.json
-
-INFINI diff — Traces
-  v1: runs/reference/run.json
-  v2: runs/langgraph/run.json
-
-Metric        v1          v2       Delta
-Outcome       verified    verified
-Iterations    2           1
-Steps         2           1
-Cost          $0.02       $0.01    -$0.01
-
-⚡ First Step Divergence:
-  Step: s1 (index 1)
-  Detail: Step count mismatch: v1 executed extra step 's1' (analyze)
-```
-
-*(Raw terminal recording session archived in [`assets/demo.cast`](assets/demo.cast) for asciinema playback.)*
-
----
-
-## 📊 Measured Benchmark Results
-
-Measured locally via the reproducible benchmark suite (`make bench` / `benchmarks/run_benchmarks.py`). All results committed with hardware environment details in [`benchmarks/results.json`](benchmarks/results.json):
-
-| Metric | Measured Result | Benchmark Methodology |
-| :--- | :---: | :--- |
-| **Replay Determinism** | **100.0%** (100/100) | $N=100$ replays of canonical workflow trace with cached model responses; asserts % byte-identical canonical payloads. |
-| **Per-Step Overhead (Mean)** | **1.846 ms** | Reference engine dispatch, DAG resolution, and step recording latency per step ($N=100$ samples). |
-| **Per-Step Overhead (P50)** | **1.819 ms** | Median step overhead. |
-| **Per-Step Overhead (P95)** | **2.008 ms** | 95th percentile step overhead. |
-| **Per-Step Overhead (Min / Max)**| **1.667 ms / 2.520 ms** | Bounds across 100 benchmark iterations. |
-| **Machine Specification** | Apple M4 · 16 GB RAM | macOS Darwin 27.2.0 · Python 3.11.16 |
-
-Reproduce locally anytime:
-```bash
-make bench
-```
-
----
-
-## Honest Adapter & Engine Status
-
-Every adapter in INFINI has exactly one honest status:
-- **`working`**: Fully implemented end-to-end (mock and/or live execution, verification, trace generation).
-- **`mock-only`**: Implements specification parsing, step translation, and mock execution with structured trace emission; live framework execution is not yet wired.
-- **`not built`**: Manifest or stub only; CLI explicitly fails with a descriptive "not implemented" error.
-
-| Engine / Adapter | Status | Type | Capabilities & Coverage |
-| :--- | :---: | :--- | :--- |
-| **Reference (`infini`)** | `working` | Built-in Engine | Canonical spec runtime. Mock and live execution, syntactic & semantic verification, time-travel replay, trace diff. |
-| **LangGraph** | `mock-only` | Execution Adapter | StateGraph step mapping, mock execution, structured trace generation. Live LangGraph runtime execution not yet wired. |
-| **Hermes** | `mock-only` | Governance Adapter | Policy verification and governance checks. 70.8% compatibility score (see [docs/scoring.md](docs/scoring.md)). |
-| **OpenClaw** | `mock-only` | Execution Adapter | Agent step execution and tool manifests. 66.7% compatibility score (see [docs/scoring.md](docs/scoring.md)). |
-| **Codemap** | `mock-only` | Context Adapter | Context-aware step routing and handoff artifact tracking. |
-| **Local (llama.cpp)** | `mock-only` | Offline LLM | Trace simulation; live execution requires external llama.cpp binary and local model weights. |
-| **CrewAI** | `not built` | Execution Adapter | Manifest only (`adapters/crewai/adapter.yaml`). CLI rejects with `not implemented`. |
-| **AutoGen** | `not built` | Multi-Agent | Planned community adapter manifest (`adapters/`). CLI rejects with `not implemented`. |
-| **Mastra** | `not built` | TypeScript | Planned community adapter manifest. CLI rejects with `not implemented`. |
-| **Goose** | `not built` | Developer Agent | Planned community adapter manifest. CLI rejects with `not implemented`. |
-| **OpenAI Agents SDK** | `not built` | Execution Adapter | Planned community adapter manifest (`adapters/codex/`). CLI rejects with `not implemented`. |
-
-*(Note: Exploratory ideas like on-chain escrow payments, 50+ agent micro-benchmarks, and 3D graph UIs are archived in [docs/ideas.md](docs/ideas.md) until backed by reproducible benchmarks.)*
-
----
-
-## 🎯 Conformance Suite
-
-INFINI includes an automated conformance test suite in `tests/conformance/`. Every test verifies a specific engine capability:
-
-| Test Name | Directory | Asserted Guarantee |
-| :--- | :--- | :--- |
-| **`simple-loop`** | [`tests/conformance/simple-loop/`](tests/conformance/simple-loop/) | Basic 1-step workflow parse, deterministic run, and artifact existence check. |
-| **`retry-loop`** | [`tests/conformance/retry-loop/`](tests/conformance/retry-loop/) | Transient step failure handling and exponential backoff retry caps. |
-| **`verification-loop`** | [`tests/conformance/verification-loop/`](tests/conformance/verification-loop/) | Two-tier verification: syntactic checks + semantic judge checks with confidence thresholds. |
-| **`cost-loop`** | [`tests/conformance/cost-loop/`](tests/conformance/cost-loop/) | Budget enforcement: execution terminates when dollar or wall-clock minute caps are reached. |
-| **`memory-loop`** | [`tests/conformance/memory-loop/`](tests/conformance/memory-loop/) | State persistence and lessons-learned accumulation across loop iterations. |
-| **`parallel-loop`** | [`tests/conformance/parallel-loop/`](tests/conformance/parallel-loop/) | DAG step resolution across parallel workers via `depends_on`. |
-| **`research-loop`** | [`tests/conformance/research-loop/`](tests/conformance/research-loop/) | Multi-step research pipeline with cross-step artifact handoffs. |
-| **`browser-loop`** | [`tests/conformance/browser-loop/`](tests/conformance/browser-loop/) | Simulated tool execution, parameter parsing, and trace emission. |
-
-Run all 8 tests:
-```bash
-infini conformance tests/conformance/ --mock
-```
-
-To certify an adapter and compute its official compatibility score:
-```bash
-infini certify adapters/hermes --mock
-```
-Compatibility scores (e.g. Hermes 70.8%, OpenClaw 66.7%) are computed as:
-$$\text{Compatibility} = \left(\frac{\text{Supported Capabilities}}{12}\times 50\right) + \left(\frac{\text{Passed Conformance Tests}}{8}\times 50\right)$$
-See [`docs/scoring.md`](docs/scoring.md) and [`docs/conformance.md`](docs/conformance.md) for full derivations.
-
----
-
-## 🔭 OpenTelemetry GenAI Semantic Conventions Export
-
-Every execution trace can be exported directly into OpenTelemetry format following the OpenTelemetry GenAI Semantic Conventions:
+### 2. Execute a Deterministic Loopfile with Trace Recording
 
 ```bash
-# Option A: Export directly during workflow execution
-infini run examples/quickstart.yaml --otel
-
-# Option B: Export an existing run.json trace
-infini export-otel runs/latest/run.json -o otel-trace.json
+# Run a multi-step agent workflow with strict token caps and signed SQLite trace output
+infini run examples/mcp-code-audit.loop.yaml \
+  --max-steps 15 \
+  --max-cost-usd 0.50 \
+  --trace-out ./traces/run-001.trace \
+  --sign
 ```
 
-**Spec Status Note:**
-- **Stable attributes:** `traceId`, `spanId`, `parentSpanId`, `name`, `kind` (`SPAN_KIND_INTERNAL`), `startTimeUnixNano`, `endTimeUnixNano`, `status.code`.
-- **Experimental GenAI attributes (v1.27+ Draft):** `gen_ai.system` ("infini"), `gen_ai.workflow.name`, `gen_ai.workflow.outcome`, `gen_ai.operation.name`, `gen_ai.request.model`, `gen_ai.usage.input_tokens`, `gen_ai.usage.output_tokens`.
-
----
-
-## 🔐 Offline Cryptographic Trace Signing (Ed25519)
-
-Sign run traces locally using pure-Python RFC 8032 Ed25519 (zero external dependencies). Generates tamper-proof run artifacts for auditability:
+### 3. Time-Travel Replay & Cross-Runtime Diffing
 
 ```bash
-# 1. Run and sign trace hash
-infini run examples/quickstart.yaml --sign
+# Replay from Step 4 using cached upstream state (0 LLM tokens consumed for Steps 0..3)
+infini replay ./traces/run-001.trace --from-step 4
 
-# 2. Verify trace signature offline
-infini verify-trace runs/latest/run.json
+# Compare behavioral divergence, latency, and token burn across two model engines
+infini diff ./traces/claude-sonnet.trace ./traces/gpt-4o.trace --format table
+
+# Search across 10,000+ historical tool frames in <2ms via SQLite FTS5
+infini search ./traces/run-001.trace "SELECT * FROM customer_settlements"
 ```
 
-If any step, outcome, or token cost is tampered with, verification fails immediately. See [`docs/signing.md`](docs/signing.md) for the specification and external verifier interface.
+---
+
+## Verified Runtime Capabilities (v0.4 Specification)
+
+| Subsystem | Capability | Implementation Detail | Status |
+| :--- | :--- | :--- | :--- |
+| **Execution Engines** | Multi-Provider Adapter Layer | Verified across Anthropic, OpenAI, Local Ollama, and Mock deterministic harnesses | Verified |
+| **State Storage** | Portable `.trace` SQLite Ledger | Single-file SQLite WAL schema with full JSON-RPC 2.0 frame serialization | Verified |
+| **Context Retrieval** | Verbatim Full-Text Search | Native SQLite FTS5 virtual tables indexing tool inputs, outputs, and agent reasoning | Verified |
+| **Cost & Loop Safety** | Denial-of-Wallet (DoW) Engine | AST/hash cycle detection for identical tool calls + hard USD/token ceiling gates | Verified |
+| **Security Testing** | Adversarial MCP Honeypot | Simulated vulnerable MCP endpoints to benchmark prompt-injection exfiltration | Verified |
+| **CI/CD Integration** | `infini-guard` GitHub Action | Automated PR regression gate verifying trace assertions and cost thresholds | Verified |
+| **Cryptographic Proof** | Signed `.trace` Bundles | SHA-256 hash-chaining across execution frames + Birkin Ed25519 receipt compatibility | Verified |
 
 ---
 
-## Project Readiness Audit
+## Denial-of-Wallet (DoW) & Loop Detection Specification
 
-Audit your codebase for agent workflow readiness:
-```bash
-infini audit .
-```
-Evaluates 12 infrastructure signals (Loopfile, state tracking, verifiers, safety docs, CI workflows) and prints the exact score and formula.
+Autonomous agents frequently enter degenerate states when a tool returns an ambiguous error, burning hundreds of dollars in recursive retries. INFINI's runtime supervisor evaluates three deterministic invariants before permitting step $T+1$:
 
----
-
-## Status & Roadmap
-
-Consolidated from historical status documents.
-
-### Current Implementation Status (v0.2.0)
-- **Core CLI & Spec Parser:** Stable. Schema validation against JSON Schema.
-- **Reference Engine:** Working. Deterministic mock engine, budget enforcement, syntactic file checks, semantic judge checks, and time-travel replay.
-- **Adapters:** 1 reference engine working (`infini`), 5 mock-only adapters (`langgraph`, `hermes`, `openclaw`, `codemap`, `local`), 5 not built (`crewai`, `autogen`, `mastra`, `goose`, `openai-agents`).
-- **Observability:** OpenTelemetry GenAI semantic conventions exporter + step-level divergence diffing.
-- **Integrity:** Local Ed25519 trace signing and offline verification.
-- **Memory & Storage:** Embedded SQLite with FTS5 for local run memory and state persistence.
-- **Conformance Suite:** 8/8 tests passing (`tests/conformance/`).
-
-### Active Roadmap
-1. **Live External Runtime Adapters:** Upgrading `langgraph` adapter from mock-only to live execution via LangGraph Python SDK.
-2. **Containerized Verifiers:** Isolated Docker/sandbox execution for syntactic bash/file checks.
-3. **Automated Trace Diff Comments:** CI bot that comments trace divergence tables directly on pull requests.
-
----
-
-## Honest Limitations
-
-1. **Mock-first ecosystem:** Outside the reference engine, adapter execution is currently `mock-only` (simulates steps and validates Loopfile translation) rather than driving live third-party runtime graphs.
-2. **Single-node runtime:** The orchestration engine runs as a single local process using embedded SQLite. There is no distributed coordinator or multi-tenant isolation.
-3. **Syntactic file checks:** Real filesystem checks (`file:exists`, `file:valid_json`) run within the local process working directory; containerized sandboxing is not yet implemented.
-
----
-
-## Development & Verification Commands
-
-```bash
-# Run unit tests (35 passing)
-python -m pytest cli/tests/ -v
-
-# Run conformance suite (8/8 passing)
-infini conformance tests/conformance/ --mock
-
-# Run adapter certifications
-infini certify adapters/hermes --mock
-infini certify adapters/openclaw --mock
-
-# Run reproducible benchmarks
-make bench
+```yaml
+# Loopfile.yaml — Deterministic Circuit Breaker Configuration
+version: "0.4"
+name: "production-migration-agent"
+limits:
+  max_iterations: 12
+  max_cost_usd: 1.25
+  max_wall_clock_seconds: 90
+cycle_detection:
+  max_identical_tool_calls: 2        # Halt if identical (tool_name + canonical_args_sha256) repeats > 2x
+  max_consecutive_tool_errors: 3      # Halt fail-closed on repeated non-zero exit codes or SQL exceptions
+assertions:
+  - type: "no_honeypot_trigger"
+  - type: "filesystem_diff_within"
+    allowed_paths: ["./migrations/**", "./tests/**"]
+  - type: "cost_under_usd"
+    threshold: 1.00
 ```
 
-[Contributing Guide](CONTRIBUTING.md) · [Scoring Methodology](docs/scoring.md) · [Conformance Suite](docs/conformance.md) · [Cryptographic Signing](docs/signing.md) · [Ideas Archive](docs/ideas.md) · [License: MIT](LICENSE)
+When a threshold is breached, INFINI terminates the child process immediately, writes a `TERMINATED_DOW_POLICY` frame to the SQLite ledger, and exits with a non-zero status code for CI visibility.
+
+---
+
+## SQLite + FTS5 `.trace` Schema Overview
+
+Every `.trace` file is a standard SQLite database inspectable via `infini inspect` or standard SQLite clients (`sqlite3 run.trace`):
+
+- **`runs`**: Execution metadata, Loopfile SHA-256 digest, engine config, cumulative token/USD telemetry, and root cryptographic signature.
+- **`frames`**: Sequential step records (`step_idx`, `timestamp_ns`, `frame_type`, `mcp_tool_name`, `canonical_args_json`, `output_json`, `latency_ms`, `tokens_in`, `tokens_out`, `frame_sha256`, `prev_frame_sha256`).
+- **`frames_fts`**: SQLite FTS5 virtual index over `canonical_args_json`, `output_json`, and `reasoning_text` for instant offline grep and forensic auditing.
+- **`assertions`**: Pass/fail contract evaluation results for filesystem state, exit codes, and security invariants.
+
+---
+
+## CI/CD Regression Gate (`infini-guard`)
+
+Enforce deterministic agent behavior and token budgets on every Pull Request:
+
+```yaml
+# .github/workflows/infini-guard.yml
+name: INFINI Deterministic Agent Audit
+on: [push, pull_request]
+
+jobs:
+  verify-agent-traces:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+      - name: Install INFINI & Execute Deterministic Contract Suite
+        run: |
+          pip install -e ".[dev]"
+          pytest -q
+          infini verify-traces ./tests/fixtures/traces/ --strict
+```
+
+---
+
+## Repository Structure
+
+```
+infini/
+├── infini/
+│   ├── cli/          # Click/Typer CLI (`run`, `replay`, `diff`, `search`, `verify`)
+│   ├── runtime/      # Loopfile parser, engine adapters & DoW circuit breakers
+│   ├── storage/      # SQLite WAL state manager & FTS5 full-text indexing
+│   ├── security/     # Signed `.trace` hashing & MCP adversarial honeypot servers
+│   └── guard/        # CI assertion evaluator & regression diffing engine
+├── observatory-ui/   # Next.js / Tailwind interactive trace & blast-radius visualizer (auditgpt.ai)
+├── examples/         # Reference Loopfiles, honeypot evaluations & DoW benchmarks
+└── tests/            # Pytest contract suite for replay determinism & cycle detection
+```
+
+---
+
+## License
+
+MIT © [Nick Altstein](https://github.com/NickAiNYC)

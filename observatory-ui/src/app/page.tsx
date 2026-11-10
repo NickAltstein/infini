@@ -2,6 +2,7 @@
 
 import { useState, useCallback, useRef, useEffect, useMemo } from "react";
 import Link from "next/link";
+import { BlastRadiusSimulator } from "@/features/blast-radius-simulator";
 import { motion, AnimatePresence } from "framer-motion";
 import { Canvas, useFrame } from "@react-three/fiber";
 import { OrbitControls } from "@react-three/drei";
@@ -322,6 +323,7 @@ const TABS = ["LIVE AGENT LOGS", "TRACE REPLAYS", "ERROR ANALYSIS", "DEPLOYED LO
 // Main Page
 // ────────────────────────────────────────────────────────────
 export default function ObservatoryPage() {
+  const [viewMode, setViewMode] = useState<"simulator" | "observatory">("simulator");
   const [trace, setTrace] = useState<Trace>(SAMPLE_TRACE);
   const [activeTab, setActiveTab] = useState<(typeof TABS)[number]>("LIVE AGENT LOGS");
   const [selectedStep, setSelectedStep] = useState<string | null>("s5");
@@ -368,6 +370,23 @@ export default function ObservatoryPage() {
     (s) => s.id === selectedStep
   );
 
+  if (viewMode === "simulator") {
+    return (
+      <div className="relative min-h-screen bg-[#0B0D11]">
+        <div className="fixed bottom-4 right-4 z-50">
+          <button
+            onClick={() => setViewMode("observatory")}
+            className="flex items-center gap-2 px-3.5 py-2 bg-[#11141C] border border-[#222733] hover:border-[#38BDF8] text-xs font-mono text-slate-300 hover:text-white shadow-2xl transition-all cursor-pointer"
+          >
+            <Boxes className="w-4 h-4 text-[#38BDF8]" />
+            <span>Open 3D Trace Observatory &rarr;</span>
+          </button>
+        </div>
+        <BlastRadiusSimulator />
+      </div>
+    );
+  }
+
   // Floating particles for atmosphere
   return (
     <div className="relative min-h-screen overflow-hidden">
@@ -402,13 +421,13 @@ export default function ObservatoryPage() {
             </p>
           </div>
           <div className="grid w-full grid-cols-2 gap-2 sm:flex sm:w-auto sm:items-center">
-            <Link
-              href="/sandbox"
-              className="btn-ghost flex items-center justify-center gap-2 text-xs border border-[#38BDF8]/40 text-[#38BDF8] hover:bg-[#38BDF8]/10 px-3 py-1.5 transition-colors"
+            <button
+              onClick={() => setViewMode("simulator")}
+              className="btn-ghost flex items-center justify-center gap-2 text-xs border border-[#38BDF8]/40 text-[#38BDF8] hover:bg-[#38BDF8]/10 px-3 py-1.5 transition-colors cursor-pointer"
             >
               <Shield className="w-4 h-4 text-[#38BDF8]" />
               Blast-Radius Simulator
-            </Link>
+            </button>
             <input
               ref={fileInputRef}
               type="file"

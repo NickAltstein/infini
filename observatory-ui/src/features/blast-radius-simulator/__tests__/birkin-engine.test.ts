@@ -162,3 +162,4 @@ describe("Birkin Deterministic Crypto Engine & Policy Firewall", () => {
     expect(receipt.matchedRules.length).toBe(0);
   });
 });
+
