@@ -106,7 +106,7 @@ def new_trace(loopfile_name: str, loopfile_yaml: str, engine_type: str = "infini
         iterations=0,
         steps=[],
         verifications=[],
-        budget={"spent_dollars": 0.0, "spent_minutes": 0.0},
+        budget={"spent_dollars": 0.0, "spent_minutes": 0.0, "spent_tokens": 0},
         outcome="running",
         lessons=[],
         provenance={
@@ -149,6 +149,7 @@ def add_step(
     )
     trace.budget["spent_dollars"] = round(trace.budget["spent_dollars"] + cost_dollars, 4)
     trace.budget["spent_minutes"] = round(trace.budget["spent_minutes"] + cost_minutes, 2)
+    trace.budget["spent_tokens"] = trace.budget.get("spent_tokens", 0) + tokens_in + tokens_out
 
 
 def finalize_trace(trace: Trace, outcome: str, lessons: list[str] | None = None) -> None:

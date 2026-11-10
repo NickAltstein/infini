@@ -55,15 +55,47 @@ def run(
             )
             _log(f"▶ mcp: {len(loopfile.tools)} server(s) declared: {names}")
 
-    # Parse iterations>=N from STOP_WHEN to use as the run cap
+    # Level 4 Loop Brakes Configuration & Enforcement
     stop_when_cap = max_iterations
+    max_tokens = loopfile.budget.tokens
+    max_dollars = loopfile.budget.dollars
+    stagnation_limit = 2
+
     for pred in loopfile.stop_when:
         if pred.startswith("iterations>="):
             try:
                 stop_when_cap = min(stop_when_cap, int(pred.split(">=")[1]))
             except (ValueError, IndexError):
                 pass
+        elif pred.startswith("tokens>="):
+            try:
+                parsed_tokens = int(pred.split(">=")[1])
+                max_tokens = parsed_tokens if max_tokens is None else min(max_tokens, parsed_tokens)
+            except (ValueError, IndexError):
+                pass
+        elif pred.startswith("dollars>=") or pred.startswith("cost>="):
+            try:
+                parsed_dollars = float(pred.split(">=")[1])
+                max_dollars = min(max_dollars, parsed_dollars)
+            except (ValueError, IndexError):
+                pass
+        elif pred.startswith("stagnation>="):
+            try:
+                stagnation_limit = int(pred.split(">=")[1])
+            except (ValueError, IndexError):
+                pass
+
     effective_max = min(max_iterations, stop_when_cap)
+
+    trace.extensions["loop_brakes"] = {
+        "max_runs": effective_max,
+        "max_dollars": max_dollars,
+        "max_tokens": max_tokens,
+        "stagnation_limit": stagnation_limit,
+        "state_persisted_per_step": True,
+        "stagnant_consecutive_rounds": 0,
+        "tripped": None,
+    }
 
     if verbose:
         _log(f"▶ engine: infini-reference {'(mock)' if mock else '(live)'}")
@@ -76,6 +108,8 @@ def run(
 
     outcome = "unverified"
     lessons: list[str] = []
+    prior_progress_sig = None
+    stagnant_rounds = 0
 
     for iteration in range(1, effective_max + 1):
         trace.iterations = iteration
@@ -101,8 +135,15 @@ def run(
                     pay_adapter.hold_in_escrow(loopfile, step.id, result.cost_dollars)
                 except ValueError as exc:
                     outcome = "budget_exceeded"
+                    reason = f"escrow budget exceeded: {exc}"
+                    trace.extensions["loop_brakes"]["tripped"] = {
+                        "brake": "max_dollars",
+                        "reason": reason,
+                        "iteration": iteration,
+                        "step": step.id,
+                    }
                     if verbose:
-                        _log(f"  ✗ budget exceeded: {exc}")
+                        _log(f"  ✗ loop brake: {reason}")
                     finalize_trace(trace, outcome, lessons)
                     pay_adapter.settle_or_refund(trace, loopfile)
                     save_trace(trace, Path(output_dir) / "run.json")
@@ -124,11 +165,38 @@ def run(
                 status_icon = "✓" if result.status == "ok" else "⚠"
                 _log(f"  {status_icon} {step.id} {step.name}  ${result.cost_dollars:.2f} · {result.cost_minutes:.1f}m")
 
-            # Check budget
-            if trace.budget["spent_dollars"] >= loopfile.budget.dollars:
+            # Level 4 loop brake: State written incrementally after every single step
+            save_trace(trace, Path(output_dir) / "run.json")
+
+            # Check dollar budget brake
+            if trace.budget["spent_dollars"] >= max_dollars:
                 outcome = "budget_exceeded"
+                reason = f"dollar budget exceeded (${trace.budget['spent_dollars']:.2f} >= ${max_dollars:.2f})"
+                trace.extensions["loop_brakes"]["tripped"] = {
+                    "brake": "max_dollars",
+                    "reason": reason,
+                    "iteration": iteration,
+                    "step": step.id,
+                }
                 if verbose:
-                    _log(f"  ✗ budget exceeded (${trace.budget['spent_dollars']:.2f} / ${loopfile.budget.dollars})")
+                    _log(f"  ✗ loop brake: {reason}")
+                finalize_trace(trace, outcome, lessons)
+                pay_adapter.settle_or_refund(trace, loopfile)
+                save_trace(trace, Path(output_dir) / "run.json")
+                return trace
+
+            # Check token ceiling brake
+            if max_tokens is not None and trace.budget.get("spent_tokens", 0) >= max_tokens:
+                outcome = "budget_exceeded"
+                reason = f"token ceiling exceeded ({trace.budget['spent_tokens']} >= {max_tokens})"
+                trace.extensions["loop_brakes"]["tripped"] = {
+                    "brake": "max_tokens",
+                    "reason": reason,
+                    "iteration": iteration,
+                    "step": step.id,
+                }
+                if verbose:
+                    _log(f"  ✗ loop brake: {reason}")
                 finalize_trace(trace, outcome, lessons)
                 pay_adapter.settle_or_refund(trace, loopfile)
                 save_trace(trace, Path(output_dir) / "run.json")
@@ -136,8 +204,15 @@ def run(
 
             if trace.budget["spent_minutes"] >= loopfile.budget.minutes:
                 outcome = "budget_exceeded"
+                reason = f"minute budget exceeded ({trace.budget['spent_minutes']:.1f}m / {loopfile.budget.minutes}m)"
+                trace.extensions["loop_brakes"]["tripped"] = {
+                    "brake": "max_minutes",
+                    "reason": reason,
+                    "iteration": iteration,
+                    "step": step.id,
+                }
                 if verbose:
-                    _log(f"  ✗ budget exceeded ({trace.budget['spent_minutes']:.1f}m / {loopfile.budget.minutes}m)")
+                    _log(f"  ✗ loop brake: {reason}")
                 finalize_trace(trace, outcome, lessons)
                 pay_adapter.settle_or_refund(trace, loopfile)
                 save_trace(trace, Path(output_dir) / "run.json")
@@ -197,8 +272,43 @@ def run(
                 _log(f"✓ shipped. state saved. lessons appended.")
             break
 
+        # Level 4 loop brake: Stagnation detection (stop after two rounds that find nothing new)
+        current_artifacts = sorted(list({a for s in trace.steps for a in s.artifacts}))
+        passed_verifs = sorted([v.check for v in trace.verifications if v.status == "pass"])
+        progress_sig = (current_artifacts, passed_verifs)
+
+        if iteration > 1 and prior_progress_sig is not None and progress_sig == prior_progress_sig:
+            stagnant_rounds += 1
+            trace.extensions["loop_brakes"]["stagnant_consecutive_rounds"] = stagnant_rounds
+            if verbose:
+                _log(f"  ⚠ stagnation warning: round {iteration} found nothing new ({stagnant_rounds}/{stagnation_limit})")
+            if stagnant_rounds >= stagnation_limit:
+                outcome = "stagnation_halted"
+                reason = f"stagnation brake: stopped after {stagnation_limit} consecutive rounds that found nothing new"
+                trace.extensions["loop_brakes"]["tripped"] = {
+                    "brake": "stagnation",
+                    "reason": reason,
+                    "iteration": iteration,
+                    "consecutive_stagnant_rounds": stagnant_rounds,
+                }
+                if verbose:
+                    _log(f"  ✗ loop brake: {reason}")
+                finalize_trace(trace, outcome, lessons)
+                pay_adapter.settle_or_refund(trace, loopfile)
+                save_trace(trace, Path(output_dir) / "run.json")
+                return trace
+        else:
+            stagnant_rounds = 0
+            prior_progress_sig = progress_sig
+
         # Check stop conditions — effective_max already accounts for STOP_WHEN iterations>=N
         if iteration >= effective_max:
+            if outcome == "unverified":
+                trace.extensions["loop_brakes"]["tripped"] = {
+                    "brake": "max_runs",
+                    "reason": f"maximum iterations cap reached ({effective_max})",
+                    "iteration": iteration,
+                }
             break
 
     finalize_trace(trace, outcome, lessons)
