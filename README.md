@@ -54,7 +54,7 @@ flowchart TB
 
 Inspect live `.trace` state machines, test MCP policy gates, and fork execution timelines directly in your browser with zero local setup:
 
-* **[Launch INFINI / Birkin Observatory Sandbox → `auditgpt.ai`](https://auditgpt.ai)**
+* **[Launch INFINI / AgentReceipts Observatory Sandbox → `auditgpt.ai`](https://auditgpt.ai)**
 
 ---
 
@@ -105,7 +105,7 @@ infini search ./traces/run-001.trace "SELECT * FROM customer_settlements"
 | **Cost & Loop Safety** | Denial-of-Wallet (DoW) Engine | AST/hash cycle detection for identical tool calls + hard USD/token ceiling gates | Verified |
 | **Security Testing** | Adversarial MCP Honeypot | Simulated vulnerable MCP endpoints to benchmark prompt-injection exfiltration | Verified |
 | **CI/CD Integration** | `infini-guard` GitHub Action | Automated PR regression gate verifying trace assertions and cost thresholds | Verified |
-| **Cryptographic Proof** | Signed `.trace` Bundles | SHA-256 hash-chaining across execution frames + Birkin Ed25519 receipt compatibility | Verified |
+| **Cryptographic Proof** | Signed `.trace` Bundles | SHA-256 hash-chaining across execution frames + AgentReceipts Ed25519 receipt compatibility | Verified |
 
 ---
 

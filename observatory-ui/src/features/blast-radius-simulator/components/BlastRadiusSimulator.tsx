@@ -318,7 +318,7 @@ export function BlastRadiusSimulator() {
         {/* Center Badges */}
         <div className="hidden lg:flex items-center gap-2 font-mono text-[11px]">
           <span className="px-2.5 py-1 bg-[#11141C] border border-[#222733] text-slate-300">
-            RUNTIME: <span className="text-emerald-400 font-semibold">Birkin (Ed25519 + Merkle)</span>
+            RUNTIME: <span className="text-emerald-400 font-semibold">AgentReceipts (Ed25519 + Merkle)</span>
           </span>
           <span className="px-2.5 py-1 bg-[#11141C] border border-[#222733] text-slate-300">
             TRACE: <span className="text-[#38BDF8] font-semibold">INFINI (SQLite + FTS5)</span>
@@ -340,12 +340,12 @@ export function BlastRadiusSimulator() {
             </span>
           </div>
           <a
-            href="https://github.com/NickAiNYC/Birkin"
+            href="https://github.com/NickAiNYC/agent-receipts"
             target="_blank"
             rel="noopener noreferrer"
             className="hidden sm:inline-block px-2 py-1 text-slate-300 hover:text-white hover:border-[#38BDF8] border border-[#222733] transition-colors"
           >
-            GitHub: Birkin
+            GitHub: agent-receipts
           </a>
           <a
             href="https://github.com/NickAiNYC/infini"
@@ -375,8 +375,36 @@ export function BlastRadiusSimulator() {
         </div>
       </header>
 
+      {/* Hero Header Component */}
+      <div className="border-b border-[#222733] bg-[#0B0D11] px-6 py-6 sm:py-8">
+        <div className="max-w-[1720px] mx-auto space-y-4">
+          <div className="inline-flex items-center gap-2 font-mono text-xs px-2.5 py-1 border border-[#222733] bg-[#11141C] text-sky-400">
+            <span>AUDITGPT.AI</span>
+            <span className="text-slate-600">/</span>
+            <span className="text-slate-300">Powered by AgentReceipts Engine</span>
+          </div>
+
+          <h1 className="font-serif text-3xl sm:text-5xl tracking-tight text-white max-w-3xl">
+            Cryptographic proof for every autonomous tool call.
+          </h1>
+
+          <p className="text-sm sm:text-base text-slate-400 max-w-2xl font-sans leading-relaxed">
+            Probabilistic LLM guardrails fail under prompt injection. <strong className="text-white font-normal">AgentReceipts</strong> enforces sub-2ms fail-closed <code className="text-sky-300 font-mono text-xs px-1.5 py-0.5 bg-[#11141C] border border-[#222733]">PreToolUse</code> hooks outside the model runtime, signing tamper-evident <code className="text-sky-300 font-mono text-xs px-1.5 py-0.5 bg-[#11141C] border border-[#222733]">Ed25519</code> receipts you can verify offline.
+          </p>
+
+          <div className="flex flex-wrap items-center gap-3 sm:gap-4 pt-2">
+            <a href="#simulator" className="px-4 py-2 bg-sky-400 text-[#0B0D11] font-mono text-xs font-semibold uppercase tracking-wider hover:bg-sky-300 transition-colors">
+              Test Live Exploit &amp; Tamper Sandbox &darr;
+            </a>
+            <a href="https://github.com/NickAiNYC/agent-receipts" target="_blank" rel="noopener noreferrer" className="px-4 py-2 border border-[#222733] bg-[#11141C] text-slate-200 font-mono text-xs hover:border-slate-600 transition-colors">
+              View GitHub (agent-receipts)
+            </a>
+          </div>
+        </div>
+      </div>
+
       {/* Main 3-Pane Split Grid */}
-      <main className="grid grid-cols-12 min-h-[calc(100vh-53px)] divide-y lg:divide-y-0 lg:divide-x divide-[#222733]">
+      <main id="simulator" className="grid grid-cols-12 min-h-[calc(100vh-53px)] divide-y lg:divide-y-0 lg:divide-x divide-[#222733]">
         {/* PANE 1: ATTACK VECTOR & SCENARIO SELECTOR (3 Cols) */}
         <section className="col-span-12 lg:col-span-3 p-5 flex flex-col justify-between bg-[#0B0D11] space-y-6">
           <div className="space-y-6">
@@ -790,12 +818,12 @@ export function BlastRadiusSimulator() {
               </div>
             </div>
 
-            {/* Column 2 — Runtime Enforcement (Birkin) */}
+            {/* Column 2 — Runtime Enforcement (AgentReceipts) */}
             <div className="p-5 border border-[#222733] bg-[#11141C] flex flex-col justify-between">
               <div className="space-y-3">
                 <div className="flex items-center justify-between">
                   <span className="font-mono text-xs font-semibold text-emerald-400 uppercase tracking-wider">
-                    2. Runtime Enforcement — Birkin
+                    2. Runtime Enforcement — AgentReceipts
                   </span>
                   <span className="font-mono text-[10px] text-slate-400 bg-[#0B0D11] px-2 py-0.5 border border-[#222733]">
                     Ed25519 + Merkle
@@ -808,19 +836,19 @@ export function BlastRadiusSimulator() {
                   <div className="text-slate-500 mb-1"># .claude/settings.json — PreToolUse Hard Hook</div>
                   <div>&#123;</div>
                   <div>&nbsp;&nbsp;<span className="text-[#38BDF8]">&quot;matcher&quot;</span>: <span className="text-emerald-400">&quot;Bash|Write|Edit|mcp__.*&quot;</span>,</div>
-                  <div>&nbsp;&nbsp;<span className="text-[#38BDF8]">&quot;hooks&quot;</span>: [&#123; <span className="text-slate-400">&quot;type&quot;</span>: <span className="text-emerald-400">&quot;command&quot;</span>, <span className="text-slate-400">&quot;command&quot;</span>: <span className="text-amber-300">&quot;python3 -m birkin.hooks.claude_code_gate&quot;</span> &#125;]</div>
+                  <div>&nbsp;&nbsp;<span className="text-[#38BDF8]">&quot;hooks&quot;</span>: [&#123; <span className="text-slate-400">&quot;type&quot;</span>: <span className="text-emerald-400">&quot;command&quot;</span>, <span className="text-slate-400">&quot;command&quot;</span>: <span className="text-amber-300">&quot;python3 -m agent_receipts.hooks.claude_code_gate&quot;</span> &#125;]</div>
                   <div>&#125;</div>
                 </div>
               </div>
               <div className="mt-4 pt-4 border-t border-[#222733] flex items-center justify-between">
-                <span className="font-mono text-[11px] text-slate-400">pip install birkin &amp;&amp; birkin init</span>
+                <span className="font-mono text-[11px] text-slate-400">pip install agent-receipts &amp;&amp; agent-receipts init</span>
                 <a
-                  href="https://github.com/NickAiNYC/Birkin"
+                  href="https://github.com/NickAiNYC/agent-receipts"
                   target="_blank"
                   rel="noopener noreferrer"
                   className="font-mono text-xs text-emerald-400 hover:underline flex items-center gap-1 font-semibold"
                 >
-                  GitHub: NickAiNYC/Birkin &rarr;
+                  GitHub: NickAiNYC/agent-receipts &rarr;
                 </a>
               </div>
             </div>
