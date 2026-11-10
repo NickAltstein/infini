@@ -1,6 +1,7 @@
 "use client";
 
 import { useState, useCallback, useRef, useEffect, useMemo } from "react";
+import Link from "next/link";
 import { motion, AnimatePresence } from "framer-motion";
 import { Canvas, useFrame } from "@react-three/fiber";
 import { OrbitControls } from "@react-three/drei";
@@ -401,6 +402,13 @@ export default function ObservatoryPage() {
             </p>
           </div>
           <div className="grid w-full grid-cols-2 gap-2 sm:flex sm:w-auto sm:items-center">
+            <Link
+              href="/sandbox"
+              className="btn-ghost flex items-center justify-center gap-2 text-xs border border-[#38BDF8]/40 text-[#38BDF8] hover:bg-[#38BDF8]/10 px-3 py-1.5 transition-colors"
+            >
+              <Shield className="w-4 h-4 text-[#38BDF8]" />
+              Blast-Radius Simulator
+            </Link>
             <input
               ref={fileInputRef}
               type="file"
