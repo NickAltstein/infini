@@ -1,16 +1,16 @@
 # INFINI
 
-**Deterministic Agent Trace Runtime, SQLite + FTS5 Time-Travel Replay CLI, and Cross-Engine Workflow Specification.**
+**Deterministic Agent Trace Runtime, SQLite Coordination Bus, and Cross-Engine Workflow Specification.**
 
 [![Specification](https://img.shields.io/badge/spec-v0.4_Verified-38BDF8?style=flat-square)](https://github.com/NickAltstein/infini)
 [![CI Guard](https://img.shields.io/badge/infini--guard-passing-10B981?style=flat-square&logo=github)](https://github.com/NickAltstein/infini/actions)
-[![Storage Engine](https://img.shields.io/badge/storage-SQLite_%2B_FTS5-0B0D11?style=flat-square)](#sqlite--fts5-trace-architecture)
+[![Coordination Engine](https://img.shields.io/badge/coordination-SQLite_%2B_FTS5-0B0D11?style=flat-square)](#deterministic-trace-format-runjson--sqlite-bus)
 [![Interactive Observatory](https://img.shields.io/badge/LIVE_DEMO-Observatory_Sandbox-38BDF8?style=flat-square)](https://auditgpt.ai)
 [![License: MIT](https://img.shields.io/badge/license-MIT-64748B?style=flat-square)](./LICENSE)
 
 Autonomous agent workflows fail silently across non-deterministic LLM sampling, brittle MCP tool calls, and runaway recursive retry loops. Standard observability platforms treat agent traces as append-only cloud telemetry—requiring external Redis/Kafka clusters while offering zero local replayability or hard circuit breakers before token budgets are exhausted.
 
-**INFINI** is a zero-dependency, portable agent execution standard (`Loopfile`) and **SQLite-backed trace orchestration CLI**. It captures every prompt, MCP JSON-RPC 2.0 frame, filesystem mutation, and environment state into a signed, content-addressed `.trace` artifact—enabling **zero-token time-travel debugging**, **cross-runtime execution diffing**, and **deterministic Denial-of-Wallet (DoW) circuit breaking**.
+**INFINI** is a zero-dependency, portable agent execution standard (`Loopfile`) and **trace orchestration CLI**. It captures every prompt, MCP JSON-RPC 2.0 frame, filesystem mutation, and environment state into a signed, content-addressed JSON trace artifact (`run.json`)—enabling **zero-token time-travel debugging**, **cross-runtime execution diffing**, and **deterministic Denial-of-Wallet (DoW) circuit breaking**.
 
 ---
 
@@ -28,10 +28,10 @@ flowchart TB
         C -->|Within Bounds| E[Execute Engine: Claude / OpenAI / Local / MCP]
     end
 
-    subgraph Ledger ["3. SQLite + FTS5 Deterministic `.trace` Artifact"]
-        E --> F[(SQLite WAL State Store)]
-        F --> G[FTS5 Verbatim Context Index]
-        F --> H[SHA-256 Frame Hash + Ed25519 Signature]
+    subgraph Ledger ["3. Canonical JSON Trace (`run.json`) & SQLite Bus"]
+        E --> F[(SQLite Coordination Bus)]
+        F --> G[FTS5 Verbatim Memory Index]
+        E --> H[SHA-256 Frame Hash + Ed25519 Signed Trace]
     end
 
     H --> I[Time-Travel Fork & Replay CLI]
@@ -43,9 +43,9 @@ flowchart TB
 
 ## Systems Engineering Guarantees
 
-- **Zero-Infrastructure SQLite + FTS5 Persistence**: Eliminates external vector databases and Redis state dependencies. Every execution trace compiles into a single portable SQLite WAL database (`*.trace`) indexed with SQLite FTS5 for sub-millisecond verbatim retrieval across tool outputs, stdout/stderr streams, and prompt contexts.
-- **Deterministic Time-Travel Forking (Zero Upstream LLM Tokens)**: Scrub to any historical step $T+N$ in a recorded `.trace` ledger, mutate the tool response or policy constraint, and deterministically replay downstream assertions without re-invoking upstream LLM API calls.
-- **Denial-of-Wallet (DoW) & Cyclic Loop Analysis**: Detects degenerate semantic retry loops (e.g., an agent repeatedly calling a failing linter or rate-limited endpoint), tracks cumulative token/cost velocity per frame, and enforces hard pre-execution budget circuit breakers.
+- **Zero-Infrastructure SQLite Bus & Deterministic Trace Logging**: Eliminates external vector databases and Redis dependencies. Inter-agent coordination and verbatim memory run on a local SQLite WAL bus (`~/.infini/infini.db`) with native FTS5 full-text indexing, while each execution compiles into a portable, content-addressed JSON trace (`run.json`) for instant replay and inspection.
+- **Deterministic Time-Travel Forking (Zero Upstream LLM Tokens)**: Scrub to any historical step $T+N$ in a recorded `run.json` trace, mutate the tool response or policy constraint, and deterministically replay downstream assertions without re-invoking upstream LLM API calls.
+- **Denial-of-Wallet (DoW) & Level 4 Loop Brakes**: Enforces hard budget circuit breakers (tokens, USD, wall-clock time), AST/hash cycle detection for repeated tool calls, per-step state persistence, and a **2-round stagnation brake** that halts execution fail-closed if two consecutive rounds discover nothing new.
 - **Adversarial Honeypot & MCP Runtime Verification**: Ships with built-in MCP honeypot servers to test agent resilience against indirect prompt injection, poisoned tool descriptions, and unauthorized filesystem traversal prior to production deployment.
 
 ---
@@ -72,11 +72,11 @@ pip install -e ".[dev]"
 ### 2. Execute a Deterministic Loopfile with Trace Recording
 
 ```bash
-# Run a multi-step agent workflow with strict token caps and signed SQLite trace output
+# Run a multi-step agent workflow with strict token caps and signed trace output
 infini run examples/mcp-code-audit.loop.yaml \
   --max-steps 15 \
   --max-cost-usd 0.50 \
-  --trace-out ./traces/run-001.trace \
+  --output ./runs/run-001 \
   --sign
 ```
 
@@ -84,13 +84,13 @@ infini run examples/mcp-code-audit.loop.yaml \
 
 ```bash
 # Replay from Step 4 using cached upstream state (0 LLM tokens consumed for Steps 0..3)
-infini replay ./traces/run-001.trace --from-step 4
+infini replay ./runs/run-001/run.json --from-step 4
 
 # Compare behavioral divergence, latency, and token burn across two model engines
-infini diff ./traces/claude-sonnet.trace ./traces/gpt-4o.trace --format table
+infini diff ./runs/claude-sonnet/run.json ./runs/gpt-4o/run.json --format table
 
-# Search across 10,000+ historical tool frames in <2ms via SQLite FTS5
-infini search ./traces/run-001.trace "SELECT * FROM customer_settlements"
+# Inspect trace summary and verification checkpoints
+infini inspect ./runs/run-001
 ```
 
 ---
@@ -100,18 +100,18 @@ infini search ./traces/run-001.trace "SELECT * FROM customer_settlements"
 | Subsystem | Capability | Implementation Detail | Status |
 | :--- | :--- | :--- | :--- |
 | **Execution Engines** | Multi-Provider Adapter Layer | Verified across Anthropic, OpenAI, Local Ollama, and Mock deterministic harnesses | Verified |
-| **State Storage** | Portable `.trace` SQLite Ledger | Single-file SQLite WAL schema with full JSON-RPC 2.0 frame serialization | Verified |
-| **Context Retrieval** | Verbatim Full-Text Search | Native SQLite FTS5 virtual tables indexing tool inputs, outputs, and agent reasoning | Verified |
-| **Cost & Loop Safety** | Denial-of-Wallet (DoW) Engine | AST/hash cycle detection for identical tool calls + hard USD/token ceiling gates | Verified |
+| **Trace Format** | Portable `run.json` Artifact | Canonical JSON execution trace with per-step inputs, outputs, status, and telemetry | Verified |
+| **Coordination Bus** | SQLite WAL & FTS5 Memory | Local SQLite message bus (`tasks`, `messages`) and verbatim memory (`lessons`, `lessons_fts`) | Verified |
+| **Cost & Loop Safety** | Level 4 Loop Brakes | Token/dollar budget caps, step timeouts, and a 2-round stagnation brake | Verified |
 | **Security Testing** | Adversarial MCP Honeypot | Simulated vulnerable MCP endpoints to benchmark prompt-injection exfiltration | Verified |
 | **CI/CD Integration** | `infini-guard` GitHub Action | Automated PR regression gate verifying trace assertions and cost thresholds | Verified |
-| **Cryptographic Proof** | Signed `.trace` Bundles | SHA-256 hash-chaining across execution frames + Receiptd Ed25519 receipt compatibility | Verified |
+| **Cryptographic Proof** | Signed `run.json` Bundles | SHA-256 frame hash-chaining + Receiptd Ed25519 signature verification | Verified |
 
 ---
 
-## Denial-of-Wallet (DoW) & Loop Detection Specification
+## Denial-of-Wallet (DoW) & Level 4 Loop Brakes
 
-Autonomous agents frequently enter degenerate states when a tool returns an ambiguous error, burning hundreds of dollars in recursive retries. INFINI's runtime supervisor evaluates three deterministic invariants before permitting step $T+1$:
+Autonomous agents frequently enter degenerate states when a tool returns an ambiguous error, burning hundreds of dollars in recursive retries. INFINI's runtime supervisor evaluates deterministic circuit breakers before and during execution:
 
 ```yaml
 # Loopfile.yaml — Deterministic Circuit Breaker Configuration
@@ -124,6 +124,7 @@ limits:
 cycle_detection:
   max_identical_tool_calls: 2        # Halt if identical (tool_name + canonical_args_sha256) repeats > 2x
   max_consecutive_tool_errors: 3      # Halt fail-closed on repeated non-zero exit codes or SQL exceptions
+  stagnation_limit: 2                 # 2-round stagnation brake: halt if 2 consecutive rounds find nothing new
 assertions:
   - type: "no_honeypot_trigger"
   - type: "filesystem_diff_within"
@@ -132,18 +133,24 @@ assertions:
     threshold: 1.00
 ```
 
-When a threshold is breached, INFINI terminates the child process immediately, writes a `TERMINATED_DOW_POLICY` frame to the SQLite ledger, and exits with a non-zero status code for CI visibility.
+When a threshold or the 2-round stagnation limit is breached, INFINI terminates immediately, writes a signed failure receipt to `run.json`, and exits with a non-zero status code for CI visibility.
 
 ---
 
-## SQLite + FTS5 `.trace` Schema Overview
+## Deterministic Trace Format (`run.json`) & SQLite Bus
 
-Every `.trace` file is a standard SQLite database inspectable via `infini inspect` or standard SQLite clients (`sqlite3 run.trace`):
+Every run emits a canonical `run.json` trace inspectable via `infini inspect <run_dir>` or standard JSON tooling:
 
-- **`runs`**: Execution metadata, Loopfile SHA-256 digest, engine config, cumulative token/USD telemetry, and root cryptographic signature.
-- **`frames`**: Sequential step records (`step_idx`, `timestamp_ns`, `frame_type`, `mcp_tool_name`, `canonical_args_json`, `output_json`, `latency_ms`, `tokens_in`, `tokens_out`, `frame_sha256`, `prev_frame_sha256`).
-- **`frames_fts`**: SQLite FTS5 virtual index over `canonical_args_json`, `output_json`, and `reasoning_text` for instant offline grep and forensic auditing.
-- **`assertions`**: Pass/fail contract evaluation results for filesystem state, exit codes, and security invariants.
+- **`engine` / `loopfile`**: Execution metadata, engine type, iteration count, and timestamps.
+- **`steps`**: Sequential step frames (`id`, `name`, `status`, `cost`, `tokens_in`, `tokens_out`, tool executions).
+- **`budget` & `brakes`**: Cumulative USD/token telemetry and tripped circuit breakers (including the 2-round stagnation brake).
+- **`verifications`**: Check results, confidence scores, and contract assertion verdicts.
+- **`provenance`**: SHA-256 frame hash-chaining and Ed25519 cryptographic signature when run with `--sign`.
+
+Inter-agent coordination and persistent memory use a local SQLite WAL database (`~/.infini/infini.db`):
+- **`tasks`**: Manager assigns, workers claim.
+- **`messages`**: Agent-to-agent communication bus.
+- **`lessons` & `lessons_fts`**: Verbatim memory with native SQLite FTS5 full-text indexing for sub-millisecond retrieval.
 
 ---
 
@@ -163,12 +170,11 @@ jobs:
       - uses: actions/checkout@v4
       - uses: actions/setup-python@v5
         with:
-          python-version: "3.12"
+          python-version: "3.11"
       - name: Install INFINI & Execute Deterministic Contract Suite
         run: |
-          pip install -e ".[dev]"
+          cd cli && pip install -e .
           pytest -q
-          infini verify-traces ./tests/fixtures/traces/ --strict
 ```
 
 ---
@@ -177,15 +183,12 @@ jobs:
 
 ```
 infini/
-├── infini/
-│   ├── cli/          # Click/Typer CLI (`run`, `replay`, `diff`, `search`, `verify`)
-│   ├── runtime/      # Loopfile parser, engine adapters & DoW circuit breakers
-│   ├── storage/      # SQLite WAL state manager & FTS5 full-text indexing
-│   ├── security/     # Signed `.trace` hashing & MCP adversarial honeypot servers
-│   └── guard/        # CI assertion evaluator & regression diffing engine
-├── observatory-ui/   # Next.js / Tailwind interactive trace & blast-radius visualizer (auditgpt.ai)
-├── examples/         # Reference Loopfiles, honeypot evaluations & DoW benchmarks
-└── tests/            # Pytest contract suite for replay determinism & cycle detection
+├── cli/              # Reference engine, CLI (`run`, `replay`, `diff`, `inspect`, `ui`), and tests
+│   ├── src/infini/   # Engine runtime, Loopfile parser, SQLite bus & loop brakes
+│   └── tests/        # Pytest contract suite for replay determinism & loop brakes
+├── loops/            # Example & domain Loopfiles
+├── observatory-ui/   # Next.js interactive trace visualizer (auditgpt.ai)
+└── spec/             # Loopfile specification & schema
 ```
 
 ---

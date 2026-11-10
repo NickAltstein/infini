@@ -15,7 +15,7 @@ pip install infini-cli
 pip install infini-cli[hermes,openclaw]
 
 # From source
-git clone https://github.com/NickAiNYC/infini
+git clone https://github.com/NickAltstein/infini
 cd infini/cli && pip install -e .
 ```
 
@@ -27,11 +27,11 @@ Requires Python 3.10+.
 
 ```bash
 infini validate  [Loopfile]   # check spec compliance
-infini run       [Loopfile]   # execute a loop (--mock for no API key)
-infini inspect   [run_dir]    # inspect a trace (--web opens Observatory, coming soon)
-infini replay    [run_dir]    # time-travel debug from any step
-infini diff      [v1] [v2]    # semantic diff between loops or traces
-infini ui        [trace]      # launch the Observatory web app
+infini run       [Loopfile]   # execute a loop (--mock for no API key, -o runs/<id>)
+infini inspect   [run_dir]    # inspect a run.json trace summary
+infini replay    [run_dir]    # time-travel debug from any step in run.json
+infini diff      [v1] [v2]    # semantic diff between two run.json traces
+infini ui        [run.json]   # launch the Observatory web app
 infini engines                # list detected adapters (reads adapter.yaml)
 infini init      [--target]   # scaffold a minimal project (Loopfile, loops/, state/, runs/)
 infini new       <name>       # create a new project scaffold
@@ -55,6 +55,24 @@ infini keys generate           # generate a publisher signing keypair
 `infini run --mock` simulates LLM calls so you can run any Loopfile
 without an API key. Useful for evaluation, CI, demos, and the conformance
 suite. Mock mode is deterministic: same Loopfile + same seed = same output.
+
+---
+
+## Trace Format & Loop Brakes
+
+### Canonical JSON Trace (`run.json`)
+Every execution emits a deterministic JSON trace (`run.json`) containing:
+- Step execution frames with inputs, outputs, status, and latency.
+- Cumulative token burn and dollar expenditure per step.
+- Verification checkpoint assertions and confidence verdicts.
+- Optional SHA-256 frame hash-chaining and Ed25519 signature (`--sign`).
+
+### Level 4 Loop Brakes
+The engine enforces deterministic circuit breakers to stop runaway agent execution:
+- **Budget Ceilings**: Hard limits on dollars (`max_cost_usd`) and tokens (`max_tokens`).
+- **Iteration & Timeouts**: Hard caps on iterations (`max_runs`) and wall-clock duration (`max_minutes`).
+- **2-Round Stagnation Brake**: Automatically halts execution fail-closed (`outcome="stagnation_halted"`) if two consecutive rounds yield no new findings or state changes (`stagnation_limit = 2`).
+- **Per-Step State Persistence**: Saves step state incrementally so runs can be resumed or inspected after interruptions.
 
 ---
 
