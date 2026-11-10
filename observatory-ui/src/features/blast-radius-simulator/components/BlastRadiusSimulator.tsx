@@ -758,7 +758,10 @@ export function BlastRadiusSimulator() {
               Wrap Any Agent In 1 Command
             </div>
             <div className="text-slate-300 text-[11px] select-all bg-[#0B0D11] p-2 border border-[#222733]">
-              $ pip install birkin &amp;&amp; birkin init --claude-code
+              $ pip install git+https://github.com/NickAltstein/receiptd &amp;&amp; receiptd init --claude-code
+            </div>
+            <div className="text-[10px] text-emerald-400 font-mono flex items-center gap-1 pt-0.5">
+              <span>✓ 100% Local Execution • Zero Data Egress • Apache 2.0 / MIT Open Source</span>
             </div>
           </div>
         </section>
@@ -775,6 +778,9 @@ export function BlastRadiusSimulator() {
               <h2 className="font-serif text-2xl text-white font-normal">
                 Pre-Deployment CI Replay &times; Runtime Deterministic Firewall
               </h2>
+              <p className="text-xs text-slate-400 font-mono mt-1">
+                Pre-merge CI testing powered by AuditGPT &amp; INFINI. Production runtime evidence powered by Receiptd.
+              </p>
             </div>
             <div className="font-mono text-xs text-slate-400">
               Zero Marketing Tiers · 100% Open Source Engineering
@@ -851,6 +857,20 @@ export function BlastRadiusSimulator() {
                   GitHub: NickAltstein/receiptd &rarr;
                 </a>
               </div>
+            </div>
+          </div>
+
+          {/* Footer Sub-bar with Compliance & Legal */}
+          <div className="mt-8 pt-6 border-t border-[#222733] flex flex-col sm:flex-row items-center justify-between gap-4 font-mono text-xs text-slate-500">
+            <div>&copy; 2026 AuditGPT Inc. &bull; Receiptd &bull; INFINI</div>
+            <div className="flex items-center gap-6">
+              <a href="/terms" className="hover:text-slate-300 transition-colors">
+                Terms of Service
+              </a>
+              <a href="/privacy" className="hover:text-slate-300 transition-colors">
+                Privacy Policy
+              </a>
+              <span className="text-emerald-400/80">Local-First · Zero Egress</span>
             </div>
           </div>
         </div>

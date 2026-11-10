@@ -15,25 +15,25 @@ const geistMono = Geist_Mono({
 });
 
 export const metadata: Metadata = {
-  title: "INFINI Observatory — Open Standard for Agent Portability",
+  title: "AuditGPT — Cryptographic Proof for Every Autonomous Tool Call",
   description:
-    "The declarative portability layer for AI agents. Write your logic once; execute it on any framework. Visualize execution traces in 3D.",
+    "Deterministic fail-closed PreToolUse runtime hooks, Ed25519 execution receipts, and pre-merge CI blast-radius gating for autonomous AI agents.",
   keywords: [
+    "AuditGPT",
+    "Receiptd",
     "INFINI",
-    "Loopfile",
-    "agent portability",
-    "agent loops",
+    "agent security",
+    "cryptographic receipts",
+    "PreToolUse",
+    "MCP",
+    "blast radius",
+    "Claude Code",
     "AI agents",
-    "LangGraph",
-    "CrewAI",
-    "OpenAI Agents",
-    "observatory",
-    "trace visualization",
   ],
-  authors: [{ name: "NickAiNYC and INFINI contributors" }],
+  authors: [{ name: "Nick Altstein" }],
   openGraph: {
-    title: "INFINI Observatory",
-    description: "The Open Standard for Agent Portability",
+    title: "AuditGPT — Cryptographic Proof for Every Autonomous Tool Call",
+    description: "Deterministic fail-closed PreToolUse runtime hooks, Ed25519 execution receipts, and pre-merge CI blast-radius gating for autonomous AI agents.",
     type: "website",
   },
 };
