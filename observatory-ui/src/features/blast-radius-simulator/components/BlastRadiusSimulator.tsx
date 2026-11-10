@@ -340,7 +340,7 @@ export function BlastRadiusSimulator() {
             </span>
           </div>
           <a
-            href="https://github.com/NickAiNYC/agent-receipts"
+            href="https://github.com/NickAltstein/agent-receipts"
             target="_blank"
             rel="noopener noreferrer"
             className="hidden sm:inline-block px-2 py-1 text-slate-300 hover:text-white hover:border-[#38BDF8] border border-[#222733] transition-colors"
@@ -348,7 +348,7 @@ export function BlastRadiusSimulator() {
             GitHub: agent-receipts
           </a>
           <a
-            href="https://github.com/NickAiNYC/infini"
+            href="https://github.com/NickAltstein/infini"
             target="_blank"
             rel="noopener noreferrer"
             className="hidden sm:inline-block px-2 py-1 text-slate-300 hover:text-white hover:border-[#38BDF8] border border-[#222733] transition-colors"
@@ -396,7 +396,7 @@ export function BlastRadiusSimulator() {
             <a href="#simulator" className="px-4 py-2 bg-sky-400 text-[#0B0D11] font-mono text-xs font-semibold uppercase tracking-wider hover:bg-sky-300 transition-colors">
               Test Live Exploit &amp; Tamper Sandbox &darr;
             </a>
-            <a href="https://github.com/NickAiNYC/agent-receipts" target="_blank" rel="noopener noreferrer" className="px-4 py-2 border border-[#222733] bg-[#11141C] text-slate-200 font-mono text-xs hover:border-slate-600 transition-colors">
+            <a href="https://github.com/NickAltstein/agent-receipts" target="_blank" rel="noopener noreferrer" className="px-4 py-2 border border-[#222733] bg-[#11141C] text-slate-200 font-mono text-xs hover:border-slate-600 transition-colors">
               View GitHub (agent-receipts)
             </a>
           </div>
@@ -808,12 +808,12 @@ export function BlastRadiusSimulator() {
               <div className="mt-4 pt-4 border-t border-[#222733] flex items-center justify-between">
                 <span className="font-mono text-[11px] text-slate-400">pip install infini-cli</span>
                 <a
-                  href="https://github.com/NickAiNYC/infini"
+                  href="https://github.com/NickAltstein/infini"
                   target="_blank"
                   rel="noopener noreferrer"
                   className="font-mono text-xs text-[#38BDF8] hover:underline flex items-center gap-1 font-semibold"
                 >
-                  GitHub: NickAiNYC/infini &rarr;
+                  GitHub: NickAltstein/infini &rarr;
                 </a>
               </div>
             </div>
@@ -843,12 +843,12 @@ export function BlastRadiusSimulator() {
               <div className="mt-4 pt-4 border-t border-[#222733] flex items-center justify-between">
                 <span className="font-mono text-[11px] text-slate-400">pip install agent-receipts &amp;&amp; agent-receipts init</span>
                 <a
-                  href="https://github.com/NickAiNYC/agent-receipts"
+                  href="https://github.com/NickAltstein/agent-receipts"
                   target="_blank"
                   rel="noopener noreferrer"
                   className="font-mono text-xs text-emerald-400 hover:underline flex items-center gap-1 font-semibold"
                 >
-                  GitHub: NickAiNYC/agent-receipts &rarr;
+                  GitHub: NickAltstein/agent-receipts &rarr;
                 </a>
               </div>
             </div>

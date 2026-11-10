@@ -2,8 +2,8 @@
 
 **Deterministic Agent Trace Runtime, SQLite + FTS5 Time-Travel Replay CLI, and Cross-Engine Workflow Specification.**
 
-[![Specification](https://img.shields.io/badge/spec-v0.4_Verified-38BDF8?style=flat-square)](https://github.com/NickAiNYC/infini)
-[![CI Guard](https://img.shields.io/badge/infini--guard-passing-10B981?style=flat-square&logo=github)](https://github.com/NickAiNYC/infini/actions)
+[![Specification](https://img.shields.io/badge/spec-v0.4_Verified-38BDF8?style=flat-square)](https://github.com/NickAltstein/infini)
+[![CI Guard](https://img.shields.io/badge/infini--guard-passing-10B981?style=flat-square&logo=github)](https://github.com/NickAltstein/infini/actions)
 [![Storage Engine](https://img.shields.io/badge/storage-SQLite_%2B_FTS5-0B0D11?style=flat-square)](#sqlite--fts5-trace-architecture)
 [![Interactive Observatory](https://img.shields.io/badge/LIVE_DEMO-Observatory_Sandbox-38BDF8?style=flat-square)](https://auditgpt.ai)
 [![License: MIT](https://img.shields.io/badge/license-MIT-64748B?style=flat-square)](./LICENSE)
@@ -64,7 +64,7 @@ Inspect live `.trace` state machines, test MCP policy gates, and fork execution 
 
 ```bash
 # Install from source in an isolated virtual environment (Python 3.11+)
-git clone https://github.com/NickAiNYC/infini.git
+git clone https://github.com/NickAltstein/infini.git
 cd infini
 pip install -e ".[dev]"
 ```
@@ -192,4 +192,4 @@ infini/
 
 ## License
 
-MIT © [Nick Altstein](https://github.com/NickAiNYC)
+MIT © [Nick Altstein](https://github.com/NickAltstein)
