@@ -59,3 +59,4 @@ test.describe("AuditGPT.ai — Blast-Radius Simulator E2E Contract Suite", () =>
     await expect(page.locator("text=ALLOWED_VERIFIED")).toBeVisible();
   });
 });
+
