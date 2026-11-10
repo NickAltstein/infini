@@ -550,7 +550,7 @@ export function BlastRadiusSimulator() {
                 <div className="flex items-center gap-2">
                   <button
                     onClick={handleToggleTamper}
-                    className={`px-2 py-0.5 border text-[10px] font-mono transition-colors flex items-center gap-1 ${
+                    className={`px-2 py-0.5 border text-[10px] font-mono transition-colors flex items-center gap-1 cursor-pointer ${
                       isTampered
                         ? "border-[#F43F5E] bg-[#F43F5E]/15 text-[#F43F5E]"
                         : "border-[#222733] text-slate-300 hover:border-rose-400 hover:text-rose-400"
@@ -558,13 +558,23 @@ export function BlastRadiusSimulator() {
                     title="Intentionally mutate a byte in the payload to test tamper detection"
                   >
                     <Bug className="w-3 h-3" />
-                    <span>{isTampered ? "REVERT TAMPER" : "CORRUPT LEDGER (1-BYTE)"}</span>
+                    <span>{isTampered ? "Revert Tamper" : "Inject 1-Byte Tamper"}</span>
                   </button>
                   <button
                     onClick={verifyActiveReceipt}
-                    className="px-2.5 py-0.5 border border-[#38BDF8] text-[#38BDF8] hover:bg-[#38BDF8]/10 text-[10px] font-mono font-semibold"
+                    className={`px-2.5 py-0.5 border text-[10px] font-mono font-semibold transition-colors cursor-pointer ${
+                      verifyStatus === "VALID"
+                        ? "border-emerald-500 bg-emerald-500/10 text-emerald-400"
+                        : verifyStatus === "TAMPERED"
+                        ? "border-[#F43F5E] bg-[#F43F5E]/10 text-[#F43F5E]"
+                        : "border-[#38BDF8] text-[#38BDF8] hover:bg-[#38BDF8]/10"
+                    }`}
                   >
-                    Verify Receipt
+                    {verifyStatus === "VALID"
+                      ? "✓ SIGNATURE VALIDATED"
+                      : verifyStatus === "TAMPERED"
+                      ? "✗ TAMPER DETECTED"
+                      : "Verify Ed25519 Signature"}
                   </button>
                 </div>
               </div>
