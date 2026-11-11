@@ -52,7 +52,7 @@ flowchart TB
 
 ## Interactive Web Observatory & Blast-Radius Sandbox
 
-Inspect live `.trace` state machines, test MCP policy gates, and fork execution timelines directly in your browser with zero local setup:
+Inspect live `run.json` execution traces, test MCP policy gates, and fork execution timelines directly in your browser with zero local setup:
 
 * **[Launch INFINI / Receiptd Observatory Sandbox → `auditgpt.ai`](https://auditgpt.ai)**
 

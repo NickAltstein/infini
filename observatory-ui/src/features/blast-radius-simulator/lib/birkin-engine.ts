@@ -264,7 +264,7 @@ export async function evaluateAndSignMCPCall(
   const merkleRoot = await computeMerkleRoot([...priorLeafHashes, payloadSha256]);
   const ed25519SignatureHex = await signPayloadHash(ctx, payloadSha256);
   const elapsed = performance.now() - t0;
-  const latencyMs = Number(Math.max(elapsed, 0.01).toFixed(2));
+  const latencyMs = Number(elapsed.toFixed(3));
 
   return {
     stepIndex,
