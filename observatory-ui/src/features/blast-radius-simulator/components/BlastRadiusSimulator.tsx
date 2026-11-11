@@ -322,7 +322,7 @@ export function BlastRadiusSimulator() {
             RUNTIME: <span className="text-emerald-400 font-semibold">Receiptd (Ed25519 + Merkle)</span>
           </span>
           <span className="px-2.5 py-1 bg-[#11141C] border border-[#222733] text-slate-300">
-            TRACE: <span className="text-[#38BDF8] font-semibold">INFINI (run.json)</span>
+            TRACE: <span className="text-[#38BDF8] font-semibold">INFINI traces</span>
           </span>
         </div>
 
@@ -335,7 +335,7 @@ export function BlastRadiusSimulator() {
             </span>
           </div>
           <div className="flex items-center gap-1.5">
-            <span className="text-[10px] text-slate-500 uppercase">Latency:</span>
+            <span className="text-[10px] text-slate-500 uppercase">In-Browser Policy Check:</span>
             <span className="text-white font-semibold">
               {formatLatency(activeReceipt?.latencyMs)}
             </span>
