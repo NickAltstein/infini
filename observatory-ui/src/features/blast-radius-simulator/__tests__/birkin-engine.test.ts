@@ -7,6 +7,7 @@ import {
   signPayloadHash,
   verifyReceiptIntegrity,
   evaluateAndSignMCPCall,
+  formatLatency,
   DEFAULT_POLICIES,
   type MCPToolCall,
 } from "../lib/birkin-engine";
@@ -160,6 +161,17 @@ describe("Birkin Deterministic Crypto Engine & Policy Firewall", () => {
     expect(receipt.decision).toBe("ALLOWED_VERIFIED");
     expect(receipt.blastRadiusScore).toBe(10);
     expect(receipt.matchedRules.length).toBe(0);
+    expect(receipt.latencyMs).toBeGreaterThan(0);
+  });
+
+  test("Latency formatting: handles sub-0.01ms, measured floats, and idle", () => {
+    expect(formatLatency(null)).toBe("—");
+    expect(formatLatency(undefined)).toBe("—");
+    expect(formatLatency(0)).toBe("<0.01ms");
+    expect(formatLatency(0.004)).toBe("<0.01ms");
+    expect(formatLatency(0.01)).toBe("0.01ms");
+    expect(formatLatency(0.123)).toBe("0.12ms");
+    expect(formatLatency(1.4)).toBe("1.40ms");
   });
 });
 
