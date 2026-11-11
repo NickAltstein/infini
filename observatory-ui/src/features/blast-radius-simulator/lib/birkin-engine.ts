@@ -263,7 +263,8 @@ export async function evaluateAndSignMCPCall(
   const payloadSha256 = await sha256Hex(canonicalPayload);
   const merkleRoot = await computeMerkleRoot([...priorLeafHashes, payloadSha256]);
   const ed25519SignatureHex = await signPayloadHash(ctx, payloadSha256);
-  const latencyMs = Number((performance.now() - t0).toFixed(2));
+  const elapsed = performance.now() - t0;
+  const latencyMs = Number(Math.max(elapsed, 0.01).toFixed(2));
 
   return {
     stepIndex,
