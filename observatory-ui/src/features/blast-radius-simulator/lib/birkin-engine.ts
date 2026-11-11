@@ -283,3 +283,8 @@ export async function evaluateAndSignMCPCall(
     signingScheme: ctx.scheme,
   };
 }
+
+export function formatLatency(latencyMs?: number | null): string {
+  if (latencyMs === null || latencyMs === undefined) return "—";
+  return latencyMs < 0.01 ? "<0.01ms" : `${latencyMs.toFixed(2)}ms`;
+}
