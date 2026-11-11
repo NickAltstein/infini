@@ -65,20 +65,20 @@ def test_loop_brakes_dollar_ceiling(tmp_path):
     assert brakes["tripped"]["brake"] == "max_dollars"
 
 
-def test_loop_brakes_stagnation_detection(tmp_path):
-    # Non-deterministic mode where verification fails repeatedly and produces identical outputs
-    # Force verification threshold to 100 so it doesn't pass
-    yaml_str = MINIMAL_LOOPFILE.replace("confidence_threshold: 85", "confidence_threshold: 99")
-    lf = parse(yaml_str)
+def test_loop_brakes_stagnation_detection(tmp_path, monkeypatch):
+    import infini.engine
 
+    # Force verification failure so loop cannot verify and must prove stagnation brake
+    monkeypatch.setattr(infini.engine, "mock_verify", lambda *args, **kwargs: (False, 50.0))
+
+    lf = parse(MINIMAL_LOOPFILE)
     trace = run(lf, output_dir=tmp_path, mock=True, max_iterations=5, deterministic=False, verbose=False)
     brakes = trace.extensions.get("loop_brakes", {})
-    # Either shipped if lucky random pass, or stagnation halted after 2 consecutive rounds finding nothing new
-    if trace.outcome != "verified":
-        assert trace.outcome == "stagnation_halted"
-        assert brakes.get("tripped") is not None
-        assert brakes["tripped"]["brake"] == "stagnation"
-        assert brakes["tripped"]["consecutive_stagnant_rounds"] >= 2
+
+    assert trace.outcome == "stagnation_halted"
+    assert brakes.get("tripped") is not None
+    assert brakes["tripped"]["brake"] == "stagnation"
+    assert brakes["tripped"]["consecutive_stagnant_rounds"] >= 2
 
 
 def test_loop_brakes_incremental_state_persistence(tmp_path):

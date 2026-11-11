@@ -336,7 +336,7 @@ export function BlastRadiusSimulator() {
           <div className="flex items-center gap-1.5">
             <span className="text-[10px] text-slate-500 uppercase">Latency:</span>
             <span className="text-white font-semibold">
-              {activeReceipt ? `${activeReceipt.latencyMs}ms` : "—"}
+              {activeReceipt ? (activeReceipt.latencyMs < 0.01 ? "<0.01ms" : `${activeReceipt.latencyMs.toFixed(2)}ms`) : "—"}
             </span>
           </div>
           <a
