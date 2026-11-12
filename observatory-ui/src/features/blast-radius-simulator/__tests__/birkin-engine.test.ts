@@ -12,7 +12,7 @@ import {
 } from "../lib/birkin-engine";
 
 describe("Birkin Deterministic Crypto Engine & Policy Firewall", () => {
-  test("RFC-8785: Canonicalizes JSON with deterministic key sorting", () => {
+  test("Canonical JSON: Canonicalizes JSON with deterministic key sorting", () => {
     const objA = { z: 1, a: 2, m: { nested_b: "foo", nested_a: "bar" } };
     const objB = { m: { nested_a: "bar", nested_b: "foo" }, a: 2, z: 1 };
 
@@ -23,7 +23,7 @@ describe("Birkin Deterministic Crypto Engine & Policy Firewall", () => {
     expect(canonA).toBe('{"a":2,"m":{"nested_a":"bar","nested_b":"foo"},"z":1}');
   });
 
-  test("RFC-8785: Canonicalizes arrays and primitive types deterministically", () => {
+  test("Canonical JSON: Canonicalizes arrays and primitive types deterministically", () => {
     expect(canonicalizeJson(null)).toBe("null");
     expect(canonicalizeJson(123)).toBe("123");
     expect(canonicalizeJson("test")).toBe('"test"');

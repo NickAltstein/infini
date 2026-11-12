@@ -2,9 +2,9 @@ import type { Metadata } from "next";
 import { BlastRadiusSimulator } from "@/features/blast-radius-simulator";
 
 export const metadata: Metadata = {
-  title: "AuditGPT — Cryptographic Proof for Every Autonomous Tool Call",
+  title: "AuditGPT Sandbox — Browser-Side Policy Simulation for Hooked Tool Calls",
   description:
-    "Interactive adversarial MCP attack vector simulator, RFC-8785 deterministic canonicalization, WebCrypto Ed25519 execution receipts, and SHA-256 Merkle audit ledgers.",
+    "Interactive adversarial MCP attack vector simulator, canonical JSON (sorted keys), WebCrypto Ed25519 execution receipts, and SHA-256 Merkle audit ledgers.",
 };
 
 export default function SandboxPage() {
