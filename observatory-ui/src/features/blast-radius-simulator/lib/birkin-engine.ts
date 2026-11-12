@@ -75,7 +75,7 @@ export const DEFAULT_POLICIES: PolicyRule[] = [
   },
 ];
 
-// 1. RFC-8785 JCS-style deterministic key sorting
+// 1. Canonical JSON: deterministic key sorting
 export function canonicalizeJson(value: unknown): string {
   if (value === null || typeof value !== "object") {
     return JSON.stringify(value);
@@ -251,7 +251,7 @@ export async function evaluateAndSignMCPCall(
 
   const decision = blocked ? "BLOCKED_FAIL_CLOSED" : "ALLOWED_VERIFIED";
   
-  // RFC-8785 canonical deterministic serialization
+  // Canonical JSON (sorted keys) serialization
   const canonicalPayload = canonicalizeJson({
     decision,
     matchedRules,

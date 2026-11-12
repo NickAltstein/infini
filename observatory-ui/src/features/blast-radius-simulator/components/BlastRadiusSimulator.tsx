@@ -385,11 +385,11 @@ export function BlastRadiusSimulator() {
           </div>
 
           <h1 className="font-serif text-3xl sm:text-5xl tracking-tight text-white max-w-3xl">
-            Cryptographic proof for every autonomous tool call.
+            Signed receipts for tool calls routed through the hook.
           </h1>
 
           <p className="text-sm sm:text-base text-slate-400 max-w-2xl font-sans leading-relaxed">
-            Probabilistic LLM guardrails fail under prompt injection. <strong className="text-white font-normal">Receiptd</strong> enforces 0.02ms in-process policy checks (~67ms cold CLI hook) outside the model runtime, signing tamper-evident <code className="text-sky-300 font-mono text-xs px-1.5 py-0.5 bg-[#11141C] border border-[#222733]">Ed25519</code> receipts you can verify offline.
+            Probabilistic LLM guardrails fail under prompt injection. <strong className="text-white font-normal">Receiptd</strong> enforces 0.02ms in-process policy checks (~78ms cold CLI hook) outside the model runtime, signing tamper-evident <code className="text-sky-300 font-mono text-xs px-1.5 py-0.5 bg-[#11141C] border border-[#222733]">Ed25519</code> receipts you can verify offline.
           </p>
 
           <div className="flex flex-wrap items-center gap-3 sm:gap-4 pt-2">
@@ -561,7 +561,7 @@ export function BlastRadiusSimulator() {
                 <Key className="w-3 h-3 text-[#38BDF8]" />
                 <span>Intercepted MCP JSON-RPC 2.0 Frame</span>
               </div>
-              <span className="font-mono text-[10px] text-slate-500">RFC-8785 Canonicalized</span>
+              <span className="font-mono text-[10px] text-slate-500">Canonical JSON (sorted keys)</span>
             </div>
             <pre className="p-3.5 border border-[#222733] bg-[#11141C] font-mono text-xs text-[#38BDF8] overflow-x-auto max-h-56 leading-relaxed">
               {displayPayload}
@@ -836,7 +836,7 @@ export function BlastRadiusSimulator() {
                   </span>
                 </div>
                 <p className="text-xs text-slate-300 leading-relaxed">
-                  Deterministic, un-bypassable execution boundary for MCP and Claude Code. Evaluates proposed tool invocations in 0.02ms in-process (~67ms cold hook process), halts violations fail-closed with exit code 2, and signs offline-verifiable receipts.
+                  Fail-closed PreToolUse gate for MCP and Claude Code tool calls routed through the hook. Evaluates proposed tool invocations in 0.02ms in-process (~78ms cold hook process), halts violations fail-closed with exit code 2, and signs offline-verifiable receipts.
                 </p>
                 <div className="bg-[#0B0D11] p-3 border border-[#222733] font-mono text-[11px] text-slate-300 leading-relaxed overflow-x-auto">
                   <div className="text-slate-500 mb-1"># .claude/settings.json — PreToolUse Hard Hook</div>
