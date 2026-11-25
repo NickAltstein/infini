@@ -2,7 +2,7 @@
 
 > **Author**: Infini Core Architecture Team  
 > **Published**: August 2026  
-> **Specification**: [RFC-402V](file:///Users/nick/infini/spec/rfcs/0402V-verified-micropayments.md)
+> **Specification**: [RFC-402V](../spec/rfcs/0402V-verified-micropayments.md)
 
 ---
 

@@ -52,3 +52,6 @@ Thumbs.db
 # Temporary
 *.tmp
 *.bak
+
+# Build artifacts
+cli/src/infini_cli.egg-info/
