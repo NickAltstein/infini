@@ -40,7 +40,7 @@ infini verify-trace runs/signed/run.json
 
 `verify-trace` checks the Ed25519 signature against the public key embedded in the trace, or against `--key` if you pass one. Only `--key` ties the trace to a key you already trust.
 
-PyPI's latest `infini-cli` release (1.1.0) differs from this repository's version (0.2.0). The commands above were checked against this repository.
+This repository is at version 1.2.0. PyPI's latest `infini-cli` is 1.1.0 until 1.2.0 is published. The commands above were checked against this repository.
 
 ### What mock mode does and does not do
 

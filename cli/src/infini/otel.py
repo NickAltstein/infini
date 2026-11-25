@@ -30,6 +30,8 @@ from datetime import datetime, timezone
 from pathlib import Path
 from typing import Any
 
+from infini import __version__
+
 
 def _iso_to_unix_nano(iso_str: str | None) -> int:
     """Convert ISO-8601 UTC timestamp to Unix nanoseconds."""
@@ -185,7 +187,7 @@ def trace_to_otel(trace_data: dict[str, Any]) -> dict[str, Any]:
                 "resource": {
                     "attributes": [
                         {"key": "service.name", "value": {"stringValue": "infini"}},
-                        {"key": "service.version", "value": {"stringValue": "0.2.0"}},
+                        {"key": "service.version", "value": {"stringValue": __version__}},
                         {"key": "telemetry.sdk.language", "value": {"stringValue": "python"}},
                         {"key": "telemetry.sdk.name", "value": {"stringValue": "opentelemetry"}},
                     ]
@@ -194,7 +196,7 @@ def trace_to_otel(trace_data: dict[str, Any]) -> dict[str, Any]:
                     {
                         "scope": {
                             "name": "io.infini.tracer",
-                            "version": "0.2.0",
+                            "version": __version__,
                         },
                         "spans": spans,
                     }

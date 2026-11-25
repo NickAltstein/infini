@@ -6,6 +6,13 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/) 
 
 ---
 
+## [1.2.0] — Unreleased
+
+### Changed
+- **Version numbering:** `infini-cli` 1.1.0 was published to PyPI in August, and the repository was later relabeled 0.2.0. The next release is 1.2.0 so that it sorts above the published 1.1.0. It includes the changes listed under 0.2.0 below.
+- **Package metadata:** project URLs point to `github.com/NickAltstein/infini`, and the author is Nick Altstein.
+- **OpenTelemetry export:** `service.version` and the tracer scope version now come from the package version instead of a hard-coded string.
+
 ## [0.2.0] — 2026-11-04
 
 ### Added
