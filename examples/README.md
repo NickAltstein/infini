@@ -11,7 +11,7 @@ and a README explaining what it demonstrates.
 
 | Example | Purpose |
 |---------|---------|
-| [`quickstart.yaml`](quickstart.yaml) | Zero-dependency minimal working workflow (<60s execution) |
+| [`quickstart.yaml`](quickstart.yaml) | Minimal working workflow; runs with `--mock` and no API key |
 | [`hello-world/`](hello-world/) | Smallest valid Loopfile — one agent, one step, one artifact |
 | [`golden-research-assistant/`](golden-research-assistant/) | Multi-agent research pipeline with citation verification gates |
 | [`golden-seo-pipeline/`](golden-seo-pipeline/) | 6-step content drafting, rubric grading, and SEO verification |

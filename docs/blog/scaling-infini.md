@@ -35,7 +35,7 @@ Our first `--plan` implementation deadlocked.
 
 The Planner, Worker, and Inspector all wrote to the SQLite database simultaneously. SQLite handles concurrent reads fine in WAL mode, but concurrent writes from multiple processes caused `database is locked` errors. The Worker would try to mark a task complete while the Inspector was writing a review, and one of them would hang.
 
-The fix was `BEGIN IMMEDIATE` transactions. Instead of the default deferred transaction mode (which acquires locks lazily), we use immediate mode for all writes. This acquires the write lock at the start of the transaction, forcing other writers to wait. The tradeoff is a small latency increase (typically <1ms) for write contention, but it eliminates deadlocks entirely.
+The planned fix was `BEGIN IMMEDIATE` transactions, which acquire the write lock at the start of a transaction so other writers wait instead of deadlocking. *Editor's note: the current code (`cli/src/infini/db.py`) sets WAL mode but does not use `BEGIN IMMEDIATE`. Whether concurrent writers are reliable is an unmeasured hypothesis, and the latency figure is not measured.*
 
 We also turned off foreign key enforcement by default. The `messages` table references `tasks(id)`, but in practice, messages can reference task IDs from other sessions or even other machines (in a future distributed mode). Enforcing FK constraints broke cross-session message passing. The fix was to keep the FK declarations in the schema for documentation but not enforce them at runtime.
 
@@ -43,7 +43,7 @@ We also turned off foreign key enforcement by default. The `messages` table refe
 
 - **8/8 conformance tests** passing, deterministic
 - **20 unit tests** covering parser, mock engine, memory, certification
-- **Zero external dependencies** beyond Python's standard library (sqlite3, json, pathlib)
+- **No external database service**: SQLite from Python's standard library. The CLI itself depends on `pyyaml`, `jsonschema`, `rich` and `click`.
 - **Three execution modes**: `--mock` (deterministic, no API key), `--live` (real LLM via Anthropic/OpenAI SDK), `--plan` (3-agent orchestration)
 - **Two certified adapters**: Hermes (70.8%) and OpenClaw (66.7%)
 - **Eternal memory**: SQLite FTS5, verbatim storage, sub-millisecond retrieval
@@ -54,7 +54,7 @@ The core is 680 lines. The full CLI (including all commands, the engine, the liv
 
 ## What We Learned
 
-1. **SQLite is enough.** For 99% of agent orchestration use cases, you don't need Redis. SQLite WAL mode handles 50+ concurrent agents on a t3.micro. The moment you need multi-host coordination, you can swap the DB layer — the SQL schema ports directly to PostgreSQL.
+1. **SQLite may be enough.** For a single host, we chose SQLite over Redis. That it handles 50+ concurrent agents on a t3.micro is an **unmeasured hypothesis**; no benchmark backs it. For multi-host coordination, the DB layer would need to change.
 
 2. **Verbatim beats summarization.** Every memory system I've used that summarizes before storing loses information. FTS5 on raw text gives you exact-match retrieval with zero API cost. The disk tradeoff is negligible (50MB for 10K runs).
 

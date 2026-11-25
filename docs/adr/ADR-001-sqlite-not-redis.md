@@ -29,22 +29,28 @@ Use SQLite in WAL mode as the message bus.
 
 SQLite is:
 - Zero-config (just a file)
-- ACID-compliant (safe concurrent writes in WAL mode)
+- ACID-compliant. INFINI opens it in WAL mode. Write behaviour with several
+  agent processes writing at once is an **unmeasured hypothesis**: the early
+  `--plan` mode hit `database is locked` errors (see
+  `docs/blog/scaling-infini.md`), and no concurrency benchmark exists.
 - Built into Python's standard library
-- Capable of 50+ concurrent agents on a t3.micro
+- **Unmeasured hypothesis:** that it serves 50+ concurrent agents on a
+  t3.micro. No benchmark backs this number.
 
 ## Consequences
 
 **Positive:**
-- No external dependencies. `pip install infini-cli` and you're done.
+- No external database service. `pip install infini-cli` installs the CLI
+  and its Python dependencies.
 - No infrastructure cost. The DB is a file on disk.
 - Full SQL access for debugging. `sqlite3 ~/.infini/infini.db` and query.
 - FTS5 gives us full-text search on lessons without a vector database.
 
 **Negative:**
-- Write contention under high concurrency. Mitigated by WAL mode and
-  short transactions. For >100 concurrent agents, a migration to
-  PostgreSQL or Redis would be needed.
+- Write contention under concurrency. WAL mode helps readers; concurrent
+  writers can still block or fail with `database is locked`. Where the
+  limit sits, and when a move to PostgreSQL or Redis would be needed, is
+  unmeasured.
 - No built-in pub/sub. We use polling (`task wait`) instead. For
   real-time dashboards, we'd need to add SQLite update hooks or
   switch to a streaming protocol.
